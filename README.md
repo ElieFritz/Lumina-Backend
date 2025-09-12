@@ -442,3 +442,33 @@ npm run start:dev
 4. **OPTIONNEL** : Optimiser les performances
 
 Le problème principal est l'erreur de syntaxe qui cause des recompilations constantes. Une fois corrigée, les performances s'amélioreront considérablement.
+
+## 🚀 Déploiement en Production
+
+Lumina Africa est configuré pour un déploiement complet avec :
+
+- **Backend** : VPS Contabo avec Docker
+- **Frontend** : Vercel
+- **Base de données** : MongoDB Atlas
+- **CI/CD** : GitHub Actions
+
+### Guide de déploiement complet
+Consultez le [Guide de Déploiement](DEPLOYMENT_GUIDE.md) pour les instructions détaillées.
+
+### Déploiement rapide
+```bash
+# 1. Configurer les secrets GitHub (voir DEPLOYMENT_GUIDE.md)
+
+# 2. Déployer le backend sur VPS
+export VPS_HOST="your-vps-ip"
+./scripts/deploy-vps.sh
+
+# 3. Le frontend se déploie automatiquement sur Vercel via GitHub Actions
+```
+
+### Infrastructure de production
+- **VPS Contabo** : Serveur Ubuntu avec Docker
+- **Vercel** : Déploiement automatique du frontend
+- **MongoDB Atlas** : Base de données cloud
+- **GitHub Actions** : CI/CD automatisé
+- **Nginx** : Reverse proxy avec SSL
