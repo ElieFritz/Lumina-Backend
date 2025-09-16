@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { UserMenu } from '@/components/ui/UserMenu';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { UserRole } from '@/types/auth';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -82,7 +83,7 @@ export function Header() {
                   <Button variant="ghost" size="sm" className="p-2">
                     <ShoppingBagIcon className="w-4 h-4 lg:w-5 lg:h-5" />
                   </Button>
-                  {(user?.role === 'owner' || user?.role === 'manager') && (
+                  {(user?.role === UserRole.VENUE_OWNER || user?.role === UserRole.ORGANIZER) && (
                     <Link href="/owner">
                       <Button variant="outline" size="sm" className="flex items-center space-x-1 lg:space-x-2">
                         <BuildingOfficeIcon className="w-3 h-3 lg:w-4 lg:h-4" />
@@ -100,7 +101,7 @@ export function Header() {
                     </Button>
                   </Link>
                   <Link href="/auth/register">
-                    <Button variant="primary" size="sm" className="text-sm">
+                    <Button variant="default" size="sm" className="text-sm">
                       S'inscrire
                     </Button>
                   </Link>
@@ -173,7 +174,7 @@ export function Header() {
                         </Button>
                       </Link>
                       <Link href="/auth/register">
-                        <Button variant="primary" className="w-full">
+                        <Button variant="default" className="w-full">
                           S'inscrire
                         </Button>
                       </Link>

@@ -6,7 +6,7 @@ import { useCallback, useEffect } from 'react';
 
 export function useAdminNavigation() {
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() || '';
   const { user, isLoading } = useAuth();
 
   const navigateToAdmin = useCallback((path: string) => {

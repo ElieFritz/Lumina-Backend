@@ -203,7 +203,7 @@ export function FeaturedVenues() {
                     {getCategoryEmoji(venue.category)} {getCategoryLabel(venue.category)}
                   </span>
                 </div>
-                {venue.isVerified && (
+                {(venue as any).isVerified && (
                   <div className="absolute top-4 right-4">
                     <div className="bg-green-500 text-white p-1 rounded-full">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -235,7 +235,7 @@ export function FeaturedVenues() {
                         <StarIcon
                           key={i}
                           className={`w-4 h-4 ${
-                            i < Math.floor(venue.averageRating || 0)
+                            i < Math.floor((venue as any).averageRating || 0)
                               ? 'text-yellow-400'
                               : 'text-gray-300'
                           }`}

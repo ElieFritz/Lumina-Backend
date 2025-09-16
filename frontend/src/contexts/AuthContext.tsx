@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/services/authService';
-import { User, LoginCredentials, RegisterData } from '@/types/auth';
+import { User, LoginCredentials, RegisterData, UserRole } from '@/types/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -71,9 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(response.user);
       
       // Rediriger selon le rôle de l'utilisateur
-      if (response.user.role === 'admin') {
+      if (response.user.role === UserRole.ADMIN) {
         router.push('/admin');
-      } else if (response.user.role === 'owner' || response.user.role === 'manager') {
+      } else if (response.user.role === UserRole.VENUE_OWNER || response.user.role === UserRole.ORGANIZER) {
         router.push('/owner');
       } else {
         router.push('/dashboard');
