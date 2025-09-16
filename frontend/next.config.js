@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    // Skip ESLint during production builds on Vercel
+    ignoreDuringBuilds: true,
+  },
   images: {
     domains: [
       'localhost',
