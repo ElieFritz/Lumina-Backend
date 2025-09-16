@@ -10,10 +10,9 @@ services:
       POSTGRES_USER: lumina_user
       POSTGRES_PASSWORD: lumina_password
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - lumina-network
 

@@ -2,21 +2,21 @@ import { Injectable, Logger, NotFoundException, BadRequestException } from '@nes
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ImportedPlace, PlaceStatus } from '../entities/imported-place.entity';
-import { User } from '../entities/user.entity';
+import { User } from '../common/entities/user.entity';
 
 export interface ClaimPlaceRequest {
   placeId: string;
   contactEmail: string;
   contactPhone: string;
   justification: string;
-  ownerId?: number;
+  ownerId?: string;
 }
 
 export interface VerifyPlaceRequest {
   placeId: string;
   status: PlaceStatus;
   notes?: string;
-  verifiedBy: number;
+  verifiedBy: string;
 }
 
 export interface ClaimPlaceResponse {
@@ -126,7 +126,7 @@ export class PlaceClaimService {
   /**
    * Get places claimed by a user
    */
-  async getClaimedPlaces(ownerId: number): Promise<ImportedPlace[]> {
+  async getClaimedPlaces(ownerId: string): Promise<ImportedPlace[]> {
     return this.importedPlaceRepository.find({
       where: { ownerId },
       order: { claimDate: 'DESC' },
@@ -193,7 +193,7 @@ export class PlaceClaimService {
   /**
    * Cancel a claim
    */
-  async cancelClaim(placeId: string, ownerId: number): Promise<ClaimPlaceResponse> {
+  async cancelClaim(placeId: string, ownerId: string): Promise<ClaimPlaceResponse> {
     const place = await this.importedPlaceRepository.findOne({
       where: { id: placeId, ownerId },
     });

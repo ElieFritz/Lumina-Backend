@@ -12,7 +12,7 @@ import {
 import { EventStatus } from '../enums/event-status.enum';
 import { User } from './user.entity';
 import { Venue } from './venue.entity';
-import { Reservation } from './reservation.entity';
+// import { Reservation } from './reservation.entity';
 import { Review } from './review.entity';
 
 @Entity('events')
@@ -105,8 +105,8 @@ export class Event {
   @Column({ name: 'venue_id' })
   venueId: string;
 
-  @OneToMany(() => Reservation, (reservation) => reservation.event)
-  reservations: Reservation[];
+  // @OneToMany(() => Reservation, (reservation) => reservation.event)
+  // reservations: Reservation[];
 
   @OneToMany(() => Review, (review) => review.event)
   reviews: Review[];

@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../common/entities/user.entity';
 
 export enum PlaceStatus {
   IMPORTED = 'imported',
@@ -110,8 +110,8 @@ export class ImportedPlace {
   lastChecked: Date;
 
   // Claim information
-  @Column({ name: 'owner_id', type: 'int', nullable: true })
-  ownerId: number;
+  @Column({ name: 'owner_id', type: 'uuid', nullable: true })
+  ownerId: string;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'owner_id' })
@@ -133,8 +133,8 @@ export class ImportedPlace {
   @Column({ name: 'verified_date', type: 'timestamp', nullable: true })
   verifiedDate: Date;
 
-  @Column({ name: 'verified_by', type: 'int', nullable: true })
-  verifiedBy: number;
+  @Column({ name: 'verified_by', type: 'uuid', nullable: true })
+  verifiedBy: string;
 
   @Column({ name: 'verification_notes', type: 'text', nullable: true })
   verificationNotes: string;

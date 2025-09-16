@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { redisStore } from 'cache-manager-redis-store';
 
 // Database configuration
-import { databaseConfig } from './config/database.config';
+import { createDatabaseConfig, defaultDatabaseConfig } from './config/database.config';
 
 // Modules
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { SimpleVenuesModule } from './modules/simple-venues.module';
 import { EventsModule } from './modules/events/events.module';
-import { ReservationsModule } from './modules/reservations/reservations.module';
+// import { ReservationsModule } from './modules/reservations/reservations.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { PromotionsModule } from './modules/promotions/promotions.module';
@@ -22,21 +22,22 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { SearchModule } from './modules/search/search.module';
 import { ArModule } from './modules/ar/ar.module';
 import { SimplePlacesImportModule } from './modules/simple-places-import.module';
+import { HealthModule } from './modules/health/health.module';
+import { DatabaseConnectionService } from './database/connection.service';
 
 @Module({
   imports: [
     // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['.env.local', '.env', '../env.development'],
+      ignoreEnvFile: false,
     }),
 
     // Database
-    TypeOrmModule.forRoot({
-      ...databaseConfig,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
-      logging: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: (configService: ConfigService) => createDatabaseConfig(configService),
+      inject: [ConfigService],
     }),
 
     // Cache (Redis)
@@ -66,11 +67,12 @@ import { SimplePlacesImportModule } from './modules/simple-places-import.module'
     ]),
 
     // Feature modules
+    HealthModule,
     AuthModule,
     UsersModule,
     SimpleVenuesModule,
     EventsModule,
-    ReservationsModule,
+    // ReservationsModule,
     PaymentsModule,
     ReviewsModule,
     PromotionsModule,
@@ -80,6 +82,8 @@ import { SimplePlacesImportModule } from './modules/simple-places-import.module'
     ArModule,
     SimplePlacesImportModule,
   ],
+  providers: [DatabaseConnectionService],
+  exports: [DatabaseConnectionService],
 })
 export class AppModule {}
 

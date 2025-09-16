@@ -1,3 +1,5 @@
+import { User } from '@/types/auth';
+
 export interface Venue {
   id: string;
   name: string;
@@ -267,25 +269,5 @@ export enum PromotionType {
   BUY_ONE_GET_ONE = 'buy_one_get_one',
 }
 
-export interface User {
-  id: string;
-  email: string;
-  phone?: string;
-  firstName: string;
-  lastName: string;
-  avatar?: string;
-  dateOfBirth?: string;
-  role: string;
-  isActive: boolean;
-  isEmailVerified: boolean;
-  isPhoneVerified: boolean;
-  lastLoginAt?: string;
-  preferences?: any;
-  location?: {
-    lat: number;
-    lng: number;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
+// User interface moved to auth.ts to avoid duplication
 

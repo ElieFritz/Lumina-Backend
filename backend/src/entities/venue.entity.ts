@@ -12,7 +12,7 @@ import { Point } from 'geojson';
 import { Event } from './event.entity';
 import { Review } from './review.entity';
 import { VenueImage } from './venue-image.entity';
-import { User } from './user.entity';
+import { User } from '../common/entities/user.entity';
 
 export enum VenueCategory {
   RESTAURANT = 'restaurant',
@@ -37,8 +37,8 @@ export enum VenueStatus {
 
 @Entity('venues')
 export class Venue {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 100 })
   name: string;

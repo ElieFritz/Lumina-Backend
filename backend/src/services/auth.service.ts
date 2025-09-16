@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService, CreateUserDto } from './user.service';
-import { User } from '../entities/user.entity';
+import { User } from '../common/entities/user.entity';
 import { jwtConfig } from '../config/database.config';
 
 export interface LoginDto {
@@ -45,7 +45,7 @@ export class AuthService {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    if (user.status !== 'active') {
+    if (!user.isActive) {
       throw new UnauthorizedException('Compte inactif');
     }
 
@@ -57,7 +57,7 @@ export class AuthService {
     };
   }
 
-  async getProfile(userId: number): Promise<Partial<User>> {
+  async getProfile(userId: string): Promise<Partial<User>> {
     const user = await this.userService.findOne(userId);
     return this.sanitizeUser(user);
   }
@@ -72,11 +72,10 @@ export class AuthService {
 
     // TODO: Générer un token de réinitialisation et envoyer un email
     const resetToken = this.generateResetToken();
-    user.passwordResetToken = resetToken;
-    user.passwordResetExpires = new Date(Date.now() + 3600000); // 1 heure
     
     await this.userService.update(user.id, {
-      // Le token sera sauvegardé via une méthode spécifique
+      resetPasswordToken: resetToken,
+      resetPasswordExpires: new Date(Date.now() + 3600000), // 1 heure
     });
 
     return { message: 'Si cet email existe, un lien de réinitialisation a été envoyé' };
@@ -106,7 +105,7 @@ export class AuthService {
   }
 
   private sanitizeUser(user: User): Partial<User> {
-    const { password, passwordResetToken, passwordResetExpires, ...sanitizedUser } = user;
+    const { password, resetPasswordToken, resetPasswordExpires, ...sanitizedUser } = user;
     return sanitizedUser;
   }
 

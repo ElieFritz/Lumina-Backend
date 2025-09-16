@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { databaseConfig, jwtConfig } from './config/database.config';
-import { User } from './entities/user.entity';
+import { User } from './common/entities/user.entity';
 import { Venue } from './entities/venue.entity';
 import { VenueImage } from './entities/venue-image.entity';
 import { Event } from './entities/event.entity';

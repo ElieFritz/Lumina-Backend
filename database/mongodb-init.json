@@ -1,0 +1,230 @@
+{
+  "users": [
+    {
+      "firstName": "Admin",
+      "lastName": "Lumina",
+      "email": "admin@lumina-africa.com",
+      "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K.",
+      "phone": "+2250701234567",
+      "role": "admin",
+      "status": "active",
+      "isEmailVerified": true,
+      "profileImage": null,
+      "dateOfBirth": "1990-01-01",
+      "gender": "M",
+      "bio": "Administrateur de Lumina Africa",
+      "preferences": {
+        "notifications": true,
+        "newsletter": true,
+        "language": "fr",
+        "currency": "XOF"
+      },
+      "socialLinks": {
+        "facebook": "https://facebook.com/lumina-africa",
+        "twitter": "https://twitter.com/lumina_africa",
+        "instagram": "https://instagram.com/lumina_africa"
+      },
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "firstName": "Jean",
+      "lastName": "Dupont",
+      "email": "jean.dupont@example.com",
+      "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8K5K5K.",
+      "phone": "+2250701234568",
+      "role": "user",
+      "status": "active",
+      "isEmailVerified": true,
+      "profileImage": null,
+      "dateOfBirth": "1995-05-15",
+      "gender": "M",
+      "bio": "Utilisateur de Lumina Africa",
+      "preferences": {
+        "notifications": true,
+        "newsletter": false,
+        "language": "fr",
+        "currency": "XOF"
+      },
+      "socialLinks": {},
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "venues": [
+    {
+      "name": "Restaurant Le Bénin",
+      "description": "Restaurant traditionnel ivoirien avec une cuisine authentique",
+      "category": "restaurant",
+      "address": "Cocody, Abidjan, Côte d'Ivoire",
+      "city": "Abidjan",
+      "country": "Côte d'Ivoire",
+      "postalCode": "00225",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [-4.0083, 5.3600]
+      },
+      "rating": 4.5,
+      "reviewCount": 25,
+      "priceRange": "€€",
+      "openingHours": {
+        "monday": { "open": "08:00", "close": "22:00" },
+        "tuesday": { "open": "08:00", "close": "22:00" },
+        "wednesday": { "open": "08:00", "close": "22:00" },
+        "thursday": { "open": "08:00", "close": "22:00" },
+        "friday": { "open": "08:00", "close": "23:00" },
+        "saturday": { "open": "09:00", "close": "23:00" },
+        "sunday": { "open": "09:00", "close": "21:00" }
+      },
+      "amenities": ["WiFi", "Parking", "Climatisation", "Terrasse"],
+      "contactInfo": {
+        "phone": "+22520203040",
+        "email": "contact@le-benin.ci",
+        "website": "https://le-benin.ci",
+        "socialMedia": {
+          "facebook": "https://facebook.com/le-benin-restaurant",
+          "instagram": "https://instagram.com/le_benin_restaurant"
+        }
+      },
+      "status": "active",
+      "isVerified": true,
+      "isFeatured": true,
+      "capacity": 100,
+      "averagePrice": 5000,
+      "currency": "XOF",
+      "tags": ["cuisine ivoirienne", "traditionnel", "familial"],
+      "notes": "Restaurant populaire avec une excellente réputation",
+      "ownerId": 1,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "name": "Cinéma Le Magic",
+      "description": "Cinéma moderne avec les dernières technologies",
+      "category": "cinema",
+      "address": "Plateau, Abidjan, Côte d'Ivoire",
+      "city": "Abidjan",
+      "country": "Côte d'Ivoire",
+      "postalCode": "00225",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [-4.0083, 5.3600]
+      },
+      "rating": 4.2,
+      "reviewCount": 18,
+      "priceRange": "€€€",
+      "openingHours": {
+        "monday": { "open": "14:00", "close": "23:00" },
+        "tuesday": { "open": "14:00", "close": "23:00" },
+        "wednesday": { "open": "14:00", "close": "23:00" },
+        "thursday": { "open": "14:00", "close": "23:00" },
+        "friday": { "open": "14:00", "close": "24:00" },
+        "saturday": { "open": "12:00", "close": "24:00" },
+        "sunday": { "open": "12:00", "close": "23:00" }
+      },
+      "amenities": ["WiFi", "Parking", "Climatisation", "Snack Bar"],
+      "contactInfo": {
+        "phone": "+22520203041",
+        "email": "info@cinema-magic.ci",
+        "website": "https://cinema-magic.ci"
+      },
+      "status": "active",
+      "isVerified": true,
+      "isFeatured": false,
+      "capacity": 300,
+      "averagePrice": 3000,
+      "currency": "XOF",
+      "tags": ["cinéma", "films", "divertissement"],
+      "notes": "Cinéma avec écrans 4K et son surround",
+      "ownerId": 1,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "title": "Concert de Musique Traditionnelle",
+      "description": "Un concert exceptionnel de musique traditionnelle ivoirienne avec les meilleurs artistes du pays",
+      "category": "concert",
+      "startDate": "2024-12-25T20:00:00.000Z",
+      "endDate": "2024-12-25T23:00:00.000Z",
+      "doorOpenTime": "2024-12-25T19:30:00.000Z",
+      "totalTickets": 100,
+      "availableTickets": 75,
+      "soldTickets": 25,
+      "ticketType": "paid",
+      "price": 10000,
+      "currency": "XOF",
+      "earlyBirdPrice": 8000,
+      "earlyBirdEndDate": "2024-12-20T23:59:59.000Z",
+      "vipPrice": 15000,
+      "vipTickets": 20,
+      "status": "published",
+      "isActive": true,
+      "isFeatured": true,
+      "minAge": 16,
+      "requirements": ["Pièce d'identité", "Vaccination COVID-19"],
+      "tags": ["musique", "traditionnel", "culture"],
+      "termsAndConditions": "Les billets ne sont pas remboursables",
+      "refundPolicy": "Remboursement possible jusqu'à 24h avant l'événement",
+      "socialLinks": {
+        "facebook": "https://facebook.com/events/concert-traditionnel",
+        "instagram": "https://instagram.com/concert_traditionnel"
+      },
+      "rating": 0,
+      "reviewCount": 0,
+      "venueId": 1,
+      "organizerId": 1,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "reviews": [
+    {
+      "rating": 5,
+      "comment": "Excellent restaurant avec une cuisine délicieuse et un service impeccable !",
+      "userId": 2,
+      "venueId": 1,
+      "eventId": null,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "rating": 4,
+      "comment": "Très bon cinéma avec des équipements modernes. Seul bémol : le prix des snacks.",
+      "userId": 2,
+      "venueId": 2,
+      "eventId": null,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "reservations": [
+    {
+      "userId": 2,
+      "venueId": 1,
+      "eventId": null,
+      "reservationDate": "2024-12-20T19:00:00.000Z",
+      "partySize": 4,
+      "status": "confirmed",
+      "specialRequests": "Table près de la fenêtre",
+      "notes": "Anniversaire de mariage",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "payments": [
+    {
+      "userId": 2,
+      "eventId": 1,
+      "amount": 10000,
+      "currency": "XOF",
+      "paymentMethod": "mobile_money",
+      "paymentStatus": "completed",
+      "transactionId": "TXN_123456789",
+      "paymentDate": "2024-01-01T00:00:00.000Z",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}

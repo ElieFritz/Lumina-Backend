@@ -8,7 +8,7 @@ import {
   JoinColumn,
   BeforeInsert,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../common/entities/user.entity';
 import { Event } from './event.entity';
 
 export enum BookingStatus {
@@ -139,12 +139,12 @@ export class Booking {
   updatedAt: Date;
 
   // Relations
-  @ManyToOne(() => User, (user) => user.bookings)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column()
-  userId: number;
+  userId: string;
 
   @ManyToOne(() => Event, (event) => event.bookings)
   @JoinColumn({ name: 'eventId' })

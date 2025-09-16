@@ -8,10 +8,13 @@ import {
   ManyToMany,
   JoinTable,
   Index,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import * as bcrypt from 'bcryptjs';
 import { UserRole } from '../enums/user-role.enum';
-import { Reservation } from './reservation.entity';
+// import { Reservation } from './reservation.entity';
 import { Review } from './review.entity';
 import { Payment } from './payment.entity';
 import { Friendship } from './friendship.entity';
@@ -92,8 +95,8 @@ export class User {
   location?: string;
 
   // Relations
-  @OneToMany(() => Reservation, (reservation) => reservation.user)
-  reservations: Reservation[];
+  // @OneToMany(() => Reservation, (reservation) => reservation.user)
+  // reservations: Reservation[];
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
@@ -133,5 +136,23 @@ export class User {
   // Virtual properties
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
+  }
+
+  // Methods
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 12);
+    }
+  }
+
+  async validatePassword(password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+  }
+
+  toJSON() {
+    const { password, ...userWithoutPassword } = this;
+    return userWithoutPassword;
   }
 }

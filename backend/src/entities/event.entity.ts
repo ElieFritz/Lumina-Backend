@@ -12,7 +12,7 @@ import { Venue } from './venue.entity';
 import { Booking } from './booking.entity';
 import { EventImage } from './event-image.entity';
 import { Review } from './review.entity';
-import { User } from './user.entity';
+import { User } from '../common/entities/user.entity';
 
 export enum EventCategory {
   CONCERT = 'concert',
@@ -46,8 +46,8 @@ export enum TicketType {
 
 @Entity('events')
 export class Event {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 200 })
   title: string;

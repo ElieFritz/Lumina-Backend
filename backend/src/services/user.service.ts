@@ -1,7 +1,8 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, UserRole, UserStatus } from '../entities/user.entity';
+import { User } from '../common/entities/user.entity';
+import { UserRole } from '../common/enums/user-role.enum';
 import * as bcrypt from 'bcryptjs';
 
 export interface CreateUserDto {
@@ -20,6 +21,8 @@ export interface UpdateUserDto {
   bio?: string;
   preferences?: any;
   socialLinks?: any;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 @Injectable()
@@ -43,7 +46,7 @@ export class UserService {
     const user = this.userRepository.create({
       ...createUserDto,
       role: createUserDto.role || UserRole.USER,
-      status: UserStatus.ACTIVE,
+      isActive: true,
       isEmailVerified: false,
     });
 
@@ -53,14 +56,14 @@ export class UserService {
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
-      select: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'status', 'isEmailVerified', 'createdAt'],
+      select: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'isActive', 'isEmailVerified', 'createdAt'],
     });
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(id: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      select: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'status', 'isEmailVerified', 'createdAt'],
+      select: ['id', 'firstName', 'lastName', 'email', 'phone', 'role', 'isActive', 'isEmailVerified', 'createdAt'],
     });
 
     if (!user) {
@@ -76,14 +79,14 @@ export class UserService {
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
     
     Object.assign(user, updateUserDto);
     return await this.userRepository.save(user);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
     await this.userRepository.remove(user);
   }
@@ -98,7 +101,7 @@ export class UserService {
     return isPasswordValid ? user : null;
   }
 
-  async updatePassword(id: number, newPassword: string): Promise<void> {
+  async updatePassword(id: string, newPassword: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('Utilisateur non trouvé');
@@ -115,8 +118,8 @@ export class UserService {
     byRole: Record<string, number>;
   }> {
     const total = await this.userRepository.count();
-    const active = await this.userRepository.count({ where: { status: UserStatus.ACTIVE } });
-    const inactive = await this.userRepository.count({ where: { status: UserStatus.INACTIVE } });
+    const active = await this.userRepository.count({ where: { isActive: true } });
+    const inactive = await this.userRepository.count({ where: { isActive: false } });
     
     const users = await this.userRepository.find({ select: ['role'] });
     const byRole = users.reduce((acc, user) => {

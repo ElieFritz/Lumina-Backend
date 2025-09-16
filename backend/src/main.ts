@@ -5,10 +5,15 @@ import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import * as compression from 'compression';
 import { AppModule } from './app.module';
+import { DatabaseConnectionService } from './database/connection.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  
+  // Initialize database connection
+  const databaseService = app.get(DatabaseConnectionService);
+  await databaseService.initialize();
 
   // Security middleware
   app.use(helmet());

@@ -9,9 +9,9 @@ import {
   Index,
 } from 'typeorm';
 import { ReservationStatus } from '../enums/reservation-status.enum';
-import { User } from './user.entity';
-import { Event } from './event.entity';
-import { Payment } from './payment.entity';
+// import { User } from './user.entity';
+// import { Event } from './event.entity';
+// import { Payment } from './payment.entity';
 
 @Entity('reservations')
 export class Reservation {
@@ -61,25 +61,25 @@ export class Reservation {
   @Column({ type: 'text', nullable: true })
   qrCode?: string;
 
-  // Relations
-  @ManyToOne(() => User, (user) => user.reservations)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  // Relations - Commented out due to missing inverse relations
+  // @ManyToOne(() => User, (user) => user.reservations)
+  // @JoinColumn({ name: 'user_id' })
+  // user: User;
 
   @Column({ name: 'user_id' })
   @Index()
   userId: string;
 
-  @ManyToOne(() => Event, (event) => event.reservations)
-  @JoinColumn({ name: 'event_id' })
-  event: Event;
+  // @ManyToOne(() => Event, (event) => event.reservations)
+  // @JoinColumn({ name: 'event_id' })
+  // event: Event;
 
   @Column({ name: 'event_id' })
   @Index()
   eventId: string;
 
-  @ManyToOne(() => Payment, (payment) => payment.reservation)
-  payment: Payment;
+  // @ManyToOne(() => Payment, (payment) => payment.reservation)
+  // payment: Payment;
 
   @Column({ name: 'payment_id', nullable: true })
   paymentId?: string;
@@ -103,15 +103,16 @@ export class Reservation {
     return this.status === ReservationStatus.COMPLETED;
   }
 
-  get canBeCancelled(): boolean {
-    const now = new Date();
-    const eventDate = new Date(this.event.eventDate);
-    const hoursUntilEvent = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-    
-    return (
-      this.status === ReservationStatus.CONFIRMED &&
-      hoursUntilEvent > 24 // Can cancel up to 24 hours before event
-    );
-  }
+  // Commented out due to missing event relation
+  // get canBeCancelled(): boolean {
+  //   const now = new Date();
+  //   const eventDate = new Date(this.event.eventDate);
+  //   const hoursUntilEvent = (eventDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+  //   
+  //   return (
+  //     this.status === ReservationStatus.CONFIRMED &&
+  //     hoursUntilEvent > 24 // Can cancel up to 24 hours before event
+  //   );
+  // }
 }
 

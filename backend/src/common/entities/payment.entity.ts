@@ -12,7 +12,7 @@ import {
 import { PaymentStatus } from '../enums/payment-status.enum';
 import { PaymentMethod } from '../enums/payment-method.enum';
 import { User } from './user.entity';
-import { Reservation } from './reservation.entity';
+// import { Reservation } from './reservation.entity';
 
 @Entity('payments')
 export class Payment {
@@ -81,8 +81,8 @@ export class Payment {
   @Index()
   userId: string;
 
-  @OneToOne(() => Reservation, (reservation) => reservation.payment)
-  reservation: Reservation;
+  // @OneToOne(() => Reservation, (reservation) => reservation.payment)
+  // reservation: Reservation;
 
   @CreateDateColumn()
   createdAt: Date;

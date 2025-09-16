@@ -1,0 +1,16 @@
+{
+  "name": "lumina-mongodb-migration",
+  "version": "1.0.0",
+  "description": "Script de migration MongoDB pour Lumina Africa",
+  "main": "mongodb-migration.js",
+  "scripts": {
+    "migrate": "node mongodb-migration.js",
+    "clear": "node mongodb-migration.js clear"
+  },
+  "dependencies": {
+    "mongodb": "^6.0.0"
+  },
+  "keywords": ["mongodb", "migration", "lumina", "africa"],
+  "author": "Lumina Africa Team",
+  "license": "MIT"
+}
