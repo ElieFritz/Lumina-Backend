@@ -109,11 +109,11 @@ export function FeaturedVenues() {
         setVenues(mockVenues.map(v => ({
           id: parseInt(v.id),
           name: v.name,
-          description: v.description,
+          description: v.description || '',
           category: v.category,
           location: {
             address: v.address,
-            city: v.city,
+            city: v.city || '',
             coordinates: v.location
           },
           rating: v.averageRating || 0,

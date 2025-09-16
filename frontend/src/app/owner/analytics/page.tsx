@@ -18,7 +18,7 @@ import {
   ComputerDesktopIcon,
   FunnelIcon,
   ArrowDownTrayIcon,
-  RefreshIcon
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 interface AnalyticsData {

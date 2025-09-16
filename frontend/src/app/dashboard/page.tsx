@@ -20,6 +20,7 @@ import {
   CogIcon
 } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+import { UserRole } from '@/types/auth';
 
 export default function DashboardPage() {
   const { user, isAuthenticated } = useAuth();
@@ -110,7 +111,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Owner Dashboard Section */}
-        {(user?.role === 'owner' || user?.role === 'manager') && (
+        {(user?.role === UserRole.VENUE_OWNER || user?.role === UserRole.ORGANIZER) && (
           <div className="mb-8">
             <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl p-6 text-white">
               <div className="flex items-center justify-between">

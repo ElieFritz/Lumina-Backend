@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { OwnerSidebar } from '@/components/owner/OwnerSidebar';
 import { OwnerHeader } from '@/components/owner/OwnerHeader';
 import { OwnerNavigation } from '@/components/owner/OwnerNavigation';
+import { UserRole } from '@/types/auth';
 
 export default function OwnerLayout({
   children,
@@ -22,8 +23,8 @@ export default function OwnerLayout({
         return;
       }
       
-      // Vérifier si l'utilisateur est propriétaire ou manager d'établissement
-      if (user.role !== 'owner' && user.role !== 'manager') {
+      // Vérifier si l'utilisateur est propriétaire/organisateur d'établissement
+      if (user.role !== UserRole.VENUE_OWNER && user.role !== UserRole.ORGANIZER) {
         // Ne rediriger que si on n'est pas déjà en train de naviguer
         if (window.location.pathname.startsWith('/owner')) {
           router.push('/dashboard');
@@ -41,7 +42,7 @@ export default function OwnerLayout({
     );
   }
 
-  if (!user || (user.role !== 'owner' && user.role !== 'manager')) {
+  if (!user || (user.role !== UserRole.VENUE_OWNER && user.role !== UserRole.ORGANIZER)) {
     return null;
   }
 
