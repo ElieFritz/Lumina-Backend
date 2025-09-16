@@ -177,7 +177,7 @@ export default function VenuesPage() {
   };
 
   const getCategoryEmoji = (category: VenueCategory) => {
-    const emojis = {
+    const emojis: Record<VenueCategory, string> = {
       [VenueCategory.RESTAURANT]: '🍽️',
       [VenueCategory.CINEMA]: '🎬',
       [VenueCategory.LOUNGE]: '🍸',
@@ -186,8 +186,9 @@ export default function VenuesPage() {
       [VenueCategory.CLUB]: '🕺',
       [VenueCategory.THEATER]: '🎭',
       [VenueCategory.SPORTS]: '⚽',
+      [VenueCategory.OTHER]: '📍',
     };
-    return emojis[category] || '📍';
+    return emojis[category] ?? '📍';
   };
 
   return (
