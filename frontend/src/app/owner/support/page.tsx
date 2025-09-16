@@ -2,203 +2,180 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  ExclamationTriangleIcon,
-  ChatBubbleLeftRightIcon,
-  PhoneIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  EyeIcon,
-  PencilIcon,
+  MagnifyingGlassIcon,
   PlusIcon,
-  BellIcon,
+  ChatBubbleLeftRightIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  ClockIcon,
   UserIcon,
   CalendarDaysIcon,
   TagIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
-  ChatBubbleBottomCenterTextIcon,
-  DocumentTextIcon,
-  PaperAirplaneIcon
+  EyeIcon,
+  ReplyIcon,
+  FlagIcon
 } from '@heroicons/react/24/outline';
 
-interface Ticket {
+interface SupportTicket {
   id: string;
   title: string;
   description: string;
+  category: 'technical' | 'billing' | 'feature' | 'bug' | 'other';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
-  category: 'technical' | 'billing' | 'service' | 'complaint' | 'feature_request';
-  customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
-  assignedTo?: string;
   createdAt: string;
   updatedAt: string;
-  resolvedAt?: string;
-  messages: TicketMessage[];
-  tags: string[];
-}
-
-interface TicketMessage {
+  lastMessageAt: string;
+  messages: Array<{
   id: string;
-  sender: 'customer' | 'staff' | 'system';
-  senderName: string;
+    sender: 'user' | 'support';
   message: string;
   timestamp: string;
   attachments?: string[];
+  }>;
+  assignedTo?: string;
+  tags: string[];
 }
 
 export default function SupportPage() {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [filteredTickets, setFilteredTickets] = useState<SupportTicket[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [newMessage, setNewMessage] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [priorityFilter, setPriorityFilter] = useState<string>('all');
-  const [showNewTicket, setShowNewTicket] = useState(false);
+  const [showNewTicketModal, setShowNewTicketModal] = useState(false);
+  const [newTicket, setNewTicket] = useState({
+    title: '',
+    description: '',
+    category: 'technical' as const,
+    priority: 'medium' as const
+  });
 
-  // Données de test
   useEffect(() => {
-    const mockTickets: Ticket[] = [
+    // Simuler le chargement des données
+    setTimeout(() => {
+      const mockTickets: SupportTicket[] = [
       {
         id: '1',
-        title: 'Problème de paiement en ligne',
-        description: 'Le client n\'arrive pas à finaliser sa réservation. Le paiement est rejeté à chaque tentative.',
+          title: 'Problème de paiement avec Mobile Money',
+          description: 'Les paiements Mobile Money ne sont pas traités correctement depuis hier.',
+          category: 'billing',
         priority: 'high',
-        status: 'in_progress',
-        category: 'technical',
-        customerName: 'Fatou Diallo',
-        customerEmail: 'fatou.diallo@email.com',
-        customerPhone: '+225 07 12 34 56 78',
-        assignedTo: 'Aminata Traoré',
+          status: 'open',
         createdAt: '2024-01-15T10:30:00Z',
-        updatedAt: '2024-01-15T14:20:00Z',
-        tags: ['paiement', 'réservation', 'urgent'],
+          updatedAt: '2024-01-15T10:30:00Z',
+          lastMessageAt: '2024-01-15T10:30:00Z',
         messages: [
           {
             id: '1',
-            sender: 'customer',
-            senderName: 'Fatou Diallo',
-            message: 'Bonjour, j\'essaie de réserver une table pour ce soir mais le paiement ne fonctionne pas. Pouvez-vous m\'aider ?',
+              sender: 'user',
+              message: 'Bonjour, j\'ai un problème avec les paiements Mobile Money. Les transactions ne sont pas traitées.',
             timestamp: '2024-01-15T10:30:00Z'
-          },
-          {
-            id: '2',
-            sender: 'staff',
-            senderName: 'Aminata Traoré',
-            message: 'Bonjour Fatou, je vais vérifier votre problème de paiement. Pouvez-vous me dire quel message d\'erreur vous obtenez exactement ?',
-            timestamp: '2024-01-15T11:15:00Z'
-          },
-          {
-            id: '3',
-            sender: 'customer',
-            senderName: 'Fatou Diallo',
-            message: 'Le message dit "Transaction échouée - Code d\'erreur 5001". J\'ai essayé avec deux cartes différentes.',
-            timestamp: '2024-01-15T11:45:00Z'
-          }
-        ]
+            }
+          ],
+          tags: ['paiement', 'mobile-money']
       },
       {
         id: '2',
-        title: 'Demande de remboursement',
-        description: 'Le client demande un remboursement pour une réservation annulée à la dernière minute.',
+          title: 'Demande de fonctionnalité : notifications push',
+          description: 'Serait-il possible d\'ajouter des notifications push pour les nouvelles réservations ?',
+          category: 'feature',
         priority: 'medium',
-        status: 'open',
-        category: 'billing',
-        customerName: 'Moussa Traoré',
-        customerEmail: 'moussa.traore@email.com',
-        customerPhone: '+225 07 23 45 67 89',
-        createdAt: '2024-01-15T09:15:00Z',
+          status: 'in_progress',
+          createdAt: '2024-01-14T14:20:00Z',
         updatedAt: '2024-01-15T09:15:00Z',
-        tags: ['remboursement', 'annulation'],
+          lastMessageAt: '2024-01-15T09:15:00Z',
         messages: [
           {
             id: '1',
-            sender: 'customer',
-            senderName: 'Moussa Traoré',
-            message: 'Bonjour, j\'ai dû annuler ma réservation d\'hier soir à cause d\'une urgence familiale. Puis-je obtenir un remboursement ?',
+              sender: 'user',
+              message: 'Bonjour, j\'aimerais savoir s\'il est possible d\'ajouter des notifications push pour les nouvelles réservations.',
+              timestamp: '2024-01-14T14:20:00Z'
+            },
+            {
+              id: '2',
+              sender: 'support',
+              message: 'Bonjour ! C\'est une excellente idée. Nous étudions cette fonctionnalité et elle devrait être disponible dans la prochaine mise à jour.',
             timestamp: '2024-01-15T09:15:00Z'
           }
-        ]
+          ],
+          assignedTo: 'Support Team',
+          tags: ['fonctionnalité', 'notifications']
       },
       {
         id: '3',
-        title: 'Service client décevant',
-        description: 'Le client se plaint du service reçu lors de sa visite hier soir.',
-        priority: 'high',
+          title: 'Bug : Affichage des images sur mobile',
+          description: 'Les images des établissements ne s\'affichent pas correctement sur les appareils mobiles.',
+          category: 'bug',
+          priority: 'medium',
         status: 'resolved',
-        category: 'complaint',
-        customerName: 'Aminata Koné',
-        customerEmail: 'aminata.kone@email.com',
-        customerPhone: '+225 07 34 56 78 90',
-        assignedTo: 'Aminata Traoré',
-        createdAt: '2024-01-14T20:30:00Z',
-        updatedAt: '2024-01-15T16:45:00Z',
-        resolvedAt: '2024-01-15T16:45:00Z',
-        tags: ['service', 'plainte', 'résolu'],
+          createdAt: '2024-01-13T16:45:00Z',
+          updatedAt: '2024-01-14T11:30:00Z',
+          lastMessageAt: '2024-01-14T11:30:00Z',
         messages: [
           {
             id: '1',
-            sender: 'customer',
-            senderName: 'Aminata Koné',
-            message: 'Bonjour, j\'ai été très déçue par le service reçu hier soir. Le serveur était impoli et la nourriture était froide.',
-            timestamp: '2024-01-14T20:30:00Z'
+              sender: 'user',
+              message: 'Les images des établissements ne s\'affichent pas correctement sur mon téléphone.',
+              timestamp: '2024-01-13T16:45:00Z'
           },
           {
             id: '2',
-            sender: 'staff',
-            senderName: 'Aminata Traoré',
-            message: 'Bonjour Aminata, je suis désolée pour votre expérience. Je vais enquêter sur cette situation et vous recontacter rapidement.',
-            timestamp: '2024-01-15T08:00:00Z'
-          },
-          {
-            id: '3',
-            sender: 'staff',
-            senderName: 'Aminata Traoré',
-            message: 'Aminata, j\'ai parlé avec l\'équipe et nous vous offrons un repas gratuit pour vous excuser. Pouvez-vous nous contacter pour organiser cela ?',
-            timestamp: '2024-01-15T16:45:00Z'
-          }
-        ]
+              sender: 'support',
+              message: 'Nous avons identifié le problème et l\'avons corrigé. Pouvez-vous vérifier maintenant ?',
+              timestamp: '2024-01-14T11:30:00Z'
+            }
+          ],
+          assignedTo: 'Dev Team',
+          tags: ['bug', 'mobile', 'images']
       },
       {
         id: '4',
-        title: 'Suggestion d\'amélioration',
-        description: 'Le client suggère d\'ajouter plus d\'options végétariennes au menu.',
+          title: 'Question sur les frais de commission',
+          description: 'Comment sont calculés les frais de commission sur les réservations ?',
+          category: 'billing',
         priority: 'low',
-        status: 'open',
-        category: 'feature_request',
-        customerName: 'Ibrahim Ouattara',
-        customerEmail: 'ibrahim.ouattara@email.com',
-        createdAt: '2024-01-15T12:00:00Z',
-        updatedAt: '2024-01-15T12:00:00Z',
-        tags: ['menu', 'végétarien', 'suggestion'],
+          status: 'closed',
+          createdAt: '2024-01-12T11:30:00Z',
+          updatedAt: '2024-01-13T08:45:00Z',
+          lastMessageAt: '2024-01-13T08:45:00Z',
         messages: [
           {
             id: '1',
-            sender: 'customer',
-            senderName: 'Ibrahim Ouattara',
-            message: 'Bonjour, j\'aimerais suggérer d\'ajouter plus d\'options végétariennes à votre menu. C\'est un excellent restaurant !',
-            timestamp: '2024-01-15T12:00:00Z'
-          }
-        ]
-      }
-    ];
-
+              sender: 'user',
+              message: 'Bonjour, pouvez-vous m\'expliquer comment sont calculés les frais de commission ?',
+              timestamp: '2024-01-12T11:30:00Z'
+            },
+            {
+              id: '2',
+              sender: 'support',
+              message: 'Les frais de commission sont de 3% sur chaque réservation réussie. Vous pouvez voir le détail dans votre tableau de bord.',
+              timestamp: '2024-01-13T08:45:00Z'
+            }
+          ],
+          assignedTo: 'Billing Team',
+          tags: ['commission', 'frais']
+        }
+      ];
     setTickets(mockTickets);
     setFilteredTickets(mockTickets);
+      setIsLoading(false);
+    }, 1000);
   }, []);
 
-  // Filtrage des tickets
   useEffect(() => {
     let filtered = tickets;
 
-    if (searchTerm) {
+    if (searchQuery) {
       filtered = filtered.filter(ticket => 
-        ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.description.toLowerCase().includes(searchTerm.toLowerCase())
+        ticket.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ticket.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ticket.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -210,380 +187,520 @@ export default function SupportPage() {
       filtered = filtered.filter(ticket => ticket.priority === priorityFilter);
     }
 
-    setFilteredTickets(filtered);
-  }, [tickets, searchTerm, statusFilter, priorityFilter]);
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(ticket => ticket.category === categoryFilter);
+    }
 
-  const handleStatusChange = (ticketId: string, newStatus: string) => {
-    setTickets(prev => prev.map(ticket => 
-      ticket.id === ticketId 
-        ? { 
-            ...ticket, 
-            status: newStatus as any,
-            updatedAt: new Date().toISOString(),
-            resolvedAt: newStatus === 'resolved' ? new Date().toISOString() : undefined
-          } 
-        : ticket
-    ));
+    setFilteredTickets(filtered);
+  }, [tickets, searchQuery, statusFilter, priorityFilter, categoryFilter]);
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      open: { color: 'red', text: 'Ouvert', icon: ExclamationTriangleIcon },
+      in_progress: { color: 'yellow', text: 'En cours', icon: ClockIcon },
+      resolved: { color: 'green', text: 'Résolu', icon: CheckCircleIcon },
+      closed: { color: 'gray', text: 'Fermé', icon: CheckCircleIcon },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig];
+    const Icon = config.icon;
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
+        <Icon className="w-3 h-3 mr-1" />
+        {config.text}
+      </span>
+    );
   };
 
-  const sendMessage = () => {
+  const getPriorityBadge = (priority: string) => {
+    const priorityConfig = {
+      low: { color: 'gray', text: 'Faible' },
+      medium: { color: 'yellow', text: 'Moyenne' },
+      high: { color: 'orange', text: 'Élevée' },
+      urgent: { color: 'red', text: 'Urgente' },
+    };
+
+    const config = priorityConfig[priority as keyof typeof priorityConfig];
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
+        {config.text}
+      </span>
+    );
+  };
+
+  const getCategoryBadge = (category: string) => {
+    const categoryConfig = {
+      technical: { color: 'blue', text: 'Technique' },
+      billing: { color: 'green', text: 'Facturation' },
+      feature: { color: 'purple', text: 'Fonctionnalité' },
+      bug: { color: 'red', text: 'Bug' },
+      other: { color: 'gray', text: 'Autre' },
+    };
+
+    const config = categoryConfig[category as keyof typeof categoryConfig];
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
+        {config.text}
+      </span>
+    );
+  };
+
+  const handleViewTicket = (ticket: SupportTicket) => {
+    setSelectedTicket(ticket);
+    setShowModal(true);
+  };
+
+  const handleSendMessage = () => {
     if (selectedTicket && newMessage.trim()) {
-      const message: TicketMessage = {
+      const message = {
         id: Date.now().toString(),
-        sender: 'staff',
-        senderName: 'Vous',
+        sender: 'user' as const,
         message: newMessage.trim(),
         timestamp: new Date().toISOString()
       };
 
-      setTickets(prev => prev.map(ticket => 
+      setTickets(prev =>
+        prev.map(ticket =>
         ticket.id === selectedTicket.id 
           ? { 
               ...ticket, 
               messages: [...ticket.messages, message],
-              updatedAt: new Date().toISOString()
+                lastMessageAt: message.timestamp,
+                updatedAt: message.timestamp
             } 
           : ticket
-      ));
+        )
+      );
 
       setNewMessage('');
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const handleCreateTicket = () => {
+    if (newTicket.title.trim() && newTicket.description.trim()) {
+      const ticket: SupportTicket = {
+        id: Date.now().toString(),
+        title: newTicket.title.trim(),
+        description: newTicket.description.trim(),
+        category: newTicket.category,
+        priority: newTicket.priority,
+        status: 'open',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastMessageAt: new Date().toISOString(),
+        messages: [{
+          id: '1',
+          sender: 'user',
+          message: newTicket.description.trim(),
+          timestamp: new Date().toISOString()
+        }],
+        tags: []
+      };
+      
+      setTickets(prev => [ticket, ...prev]);
+      setNewTicket({ title: '', description: '', category: 'technical', priority: 'medium' });
+      setShowNewTicketModal(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-red-100 text-red-800';
-      case 'in_progress': return 'bg-blue-100 text-blue-800';
-      case 'resolved': return 'bg-green-100 text-green-800';
-      case 'closed': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'technical': return 'bg-purple-100 text-purple-800';
-      case 'billing': return 'bg-blue-100 text-blue-800';
-      case 'service': return 'bg-green-100 text-green-800';
-      case 'complaint': return 'bg-red-100 text-red-800';
-      case 'feature_request': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const stats = {
-    total: tickets.length,
-    open: tickets.filter(t => t.status === 'open').length,
-    inProgress: tickets.filter(t => t.status === 'in_progress').length,
-    resolved: tickets.filter(t => t.status === 'resolved').length,
-    urgent: tickets.filter(t => t.priority === 'urgent').length
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Support & Incidents</h1>
-          <p className="text-gray-600">Gérez les tickets de support et les incidents clients</p>
+          <h1 className="text-3xl font-bold text-gray-900">Support & Assistance</h1>
+          <p className="mt-2 text-gray-600">
+            Gérez vos tickets de support et obtenez de l'aide
+          </p>
         </div>
         <button
-          onClick={() => setShowNewTicket(true)}
+          onClick={() => setShowNewTicketModal(true)}
           className="btn-primary"
         >
-          <PlusIcon className="w-5 h-5 mr-2" />
+          <PlusIcon className="w-4 h-4 mr-2" />
           Nouveau ticket
         </button>
       </div>
 
-      {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <ChatBubbleLeftRightIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 rounded-lg bg-blue-100">
+              <ChatBubbleLeftRightIcon className="h-6 w-6 text-blue-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total tickets</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-2xl font-bold text-gray-900">{tickets.length}</p>
             </div>
           </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-red-100 rounded-lg">
-              <ExclamationTriangleIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 rounded-lg bg-red-100">
+              <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Ouverts</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.open}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {tickets.filter(t => t.status === 'open').length}
+              </p>
             </div>
           </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <ClockIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 rounded-lg bg-yellow-100">
+              <ClockIcon className="h-6 w-6 text-yellow-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">En cours</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {tickets.filter(t => t.status === 'in_progress').length}
+              </p>
             </div>
           </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 rounded-lg bg-green-100">
+              <CheckCircleIcon className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Résolus</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.resolved}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-red-100 rounded-lg">
-              <BellIcon className="w-6 h-6 text-red-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Urgents</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.urgent}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {tickets.filter(t => t.status === 'resolved').length}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filtres */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rechercher
+            </label>
             <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Rechercher par titre, client ou description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Titre, description, tags..."
+                className="input pl-10"
               />
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Statut
+            </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="input"
             >
               <option value="all">Tous les statuts</option>
-              <option value="open">Ouverts</option>
+              <option value="open">Ouvert</option>
               <option value="in_progress">En cours</option>
-              <option value="resolved">Résolus</option>
-              <option value="closed">Fermés</option>
+              <option value="resolved">Résolu</option>
+              <option value="closed">Fermé</option>
             </select>
+          </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Priorité
+            </label>
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="input"
             >
               <option value="all">Toutes les priorités</option>
-              <option value="urgent">Urgent</option>
-              <option value="high">Élevée</option>
-              <option value="medium">Moyenne</option>
               <option value="low">Faible</option>
+              <option value="medium">Moyenne</option>
+              <option value="high">Élevée</option>
+              <option value="urgent">Urgente</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Catégorie
+            </label>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="input"
+            >
+              <option value="all">Toutes les catégories</option>
+              <option value="technical">Technique</option>
+              <option value="billing">Facturation</option>
+              <option value="feature">Fonctionnalité</option>
+              <option value="bug">Bug</option>
+              <option value="other">Autre</option>
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setStatusFilter('all');
+                setPriorityFilter('all');
+                setCategoryFilter('all');
+              }}
+              className="btn-outline w-full"
+            >
+              Effacer
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Liste des tickets */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Tickets ({filteredTickets.length})
-              </h2>
-            </div>
-
-            <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+      {/* Tickets List */}
+      <div className="space-y-4">
               {filteredTickets.map((ticket) => (
-                <div
-                  key={ticket.id}
-                  onClick={() => setSelectedTicket(ticket)}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                    selectedTicket?.id === ticket.id ? 'bg-primary-50 border-r-2 border-primary-500' : ''
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-medium text-gray-900 text-sm line-clamp-2">
-                      {ticket.title}
-                    </h3>
-                    <div className="flex space-x-1 ml-2">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
-                        {ticket.priority === 'urgent' ? 'Urgent' :
-                         ticket.priority === 'high' ? 'Élevée' :
-                         ticket.priority === 'medium' ? 'Moyenne' : 'Faible'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                    <span>{ticket.customerName}</span>
-                    <span>{new Date(ticket.createdAt).toLocaleDateString('fr-FR')}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(ticket.status)}`}>
-                      {ticket.status === 'open' ? 'Ouvert' :
-                       ticket.status === 'in_progress' ? 'En cours' :
-                       ticket.status === 'resolved' ? 'Résolu' : 'Fermé'}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {ticket.messages.length} message{ticket.messages.length > 1 ? 's' : ''}
-                    </span>
+          <div key={ticket.id} className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-medium text-gray-900">{ticket.title}</h3>
+                  <div className="flex items-center space-x-2">
+                    {getStatusBadge(ticket.status)}
+                    {getPriorityBadge(ticket.priority)}
+                    {getCategoryBadge(ticket.category)}
                   </div>
                 </div>
-              ))}
+                
+                <p className="text-gray-600 mb-4">{ticket.description}</p>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <div className="flex items-center">
+                      <CalendarDaysIcon className="w-4 h-4 mr-1" />
+                      {new Date(ticket.createdAt).toLocaleDateString('fr-FR')}
             </div>
+                    <div className="flex items-center">
+                      <UserIcon className="w-4 h-4 mr-1" />
+                      {ticket.assignedTo || 'Non assigné'}
           </div>
-        </div>
-
-        {/* Détails du ticket */}
-        <div className="lg:col-span-2">
-          {selectedTicket ? (
-            <div className="bg-white rounded-lg border border-gray-200">
-              {/* Header du ticket */}
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                      {selectedTicket.title}
-                    </h2>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <span>Par {selectedTicket.customerName}</span>
-                      <span>•</span>
-                      <span>{new Date(selectedTicket.createdAt).toLocaleDateString('fr-FR')}</span>
+                    <div className="flex items-center">
+                      <ChatBubbleLeftRightIcon className="w-4 h-4 mr-1" />
+                      {ticket.messages.length} message(s)
                     </div>
                   </div>
-                  <div className="flex space-x-2">
-                    <select
-                      value={selectedTicket.status}
-                      onChange={(e) => handleStatusChange(selectedTicket.id, e.target.value)}
-                      className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleViewTicket(ticket)}
+                      className="btn-outline"
                     >
-                      <option value="open">Ouvert</option>
-                      <option value="in_progress">En cours</option>
-                      <option value="resolved">Résolu</option>
-                      <option value="closed">Fermé</option>
-                    </select>
+                      <EyeIcon className="w-4 h-4 mr-2" />
+                      Voir
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-4 mb-4">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(selectedTicket.priority)}`}>
-                    {selectedTicket.priority === 'urgent' ? 'Urgent' :
-                     selectedTicket.priority === 'high' ? 'Élevée' :
-                     selectedTicket.priority === 'medium' ? 'Moyenne' : 'Faible'}
-                  </span>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(selectedTicket.category)}`}>
-                    {selectedTicket.category === 'technical' ? 'Technique' :
-                     selectedTicket.category === 'billing' ? 'Facturation' :
-                     selectedTicket.category === 'service' ? 'Service' :
-                     selectedTicket.category === 'complaint' ? 'Plainte' : 'Suggestion'}
-                  </span>
-                </div>
-
-                <p className="text-gray-700 mb-4">{selectedTicket.description}</p>
-
-                <div className="flex flex-wrap gap-2">
-                  {selectedTicket.tags.map((tag) => (
-                    <span key={tag} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                {ticket.tags.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {ticket.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                      >
                       <TagIcon className="w-3 h-3 mr-1" />
                       {tag}
                     </span>
                   ))}
                 </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filteredTickets.length === 0 && (
+        <div className="text-center py-12">
+          <ChatBubbleLeftRightIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun ticket trouvé</h3>
+          <p className="text-gray-500">Aucun ticket ne correspond à vos critères de recherche.</p>
+        </div>
+      )}
+
+      {/* Ticket Details Modal */}
+      {showModal && selectedTicket && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-medium text-gray-900">{selectedTicket.title}</h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
               </div>
 
-              {/* Messages */}
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Conversation ({selectedTicket.messages.length})
-                </h3>
-
-                <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  {getStatusBadge(selectedTicket.status)}
+                  {getPriorityBadge(selectedTicket.priority)}
+                  {getCategoryBadge(selectedTicket.category)}
+                </div>
+                
+                <div className="border-t pt-4">
+                  <h4 className="text-md font-medium text-gray-900 mb-3">Messages</h4>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
                   {selectedTicket.messages.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.sender === 'staff' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          message.sender === 'staff'
-                            ? 'bg-primary-600 text-white'
-                            : message.sender === 'system'
-                            ? 'bg-gray-100 text-gray-700'
-                            : 'bg-gray-200 text-gray-900'
+                        className={`p-3 rounded-lg ${
+                          message.sender === 'user'
+                            ? 'bg-blue-50 ml-8'
+                            : 'bg-gray-50 mr-8'
                         }`}
                       >
-                        <p className="text-sm">{message.message}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.sender === 'staff' ? 'text-primary-100' : 'text-gray-500'
-                        }`}>
-                          {message.senderName} • {new Date(message.timestamp).toLocaleString('fr-FR')}
-                        </p>
+                        <div className="flex justify-between items-start">
+                          <p className="text-sm text-gray-900">{message.message}</p>
+                          <span className="text-xs text-gray-500 ml-2">
+                            {new Date(message.timestamp).toLocaleString('fr-FR')}
+                          </span>
+                        </div>
                       </div>
+                    ))}
                     </div>
-                  ))}
                 </div>
 
-                {/* Nouveau message */}
-                <div className="border-t border-gray-200 pt-4">
-                  <div className="flex space-x-3">
-                    <textarea
+                <div className="border-t pt-4">
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Tapez votre réponse..."
-                      rows={3}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      placeholder="Tapez votre message..."
+                      className="flex-1 input"
                     />
                     <button
-                      onClick={sendMessage}
+                      onClick={handleSendMessage}
                       disabled={!newMessage.trim()}
-                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="btn-primary"
                     >
-                      <PaperAirplaneIcon className="w-5 h-5" />
+                      <ReplyIcon className="w-4 h-4 mr-2" />
+                      Envoyer
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-              <ChatBubbleLeftRightIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Sélectionnez un ticket</h3>
-              <p className="text-gray-600">Choisissez un ticket dans la liste pour voir les détails et répondre.</p>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* New Ticket Modal */}
+      {showNewTicketModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Nouveau ticket de support</h3>
+                <button
+                  onClick={() => setShowNewTicketModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+                  <input
+                    type="text"
+                    value={newTicket.title}
+                    onChange={(e) => setNewTicket(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Décrivez brièvement votre problème..."
+                    className="input"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea
+                    value={newTicket.description}
+                    onChange={(e) => setNewTicket(prev => ({ ...prev, description: e.target.value }))}
+                    rows={4}
+                    placeholder="Décrivez en détail votre problème ou votre demande..."
+                    className="input"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Catégorie</label>
+                    <select
+                      value={newTicket.category}
+                      onChange={(e) => setNewTicket(prev => ({ ...prev, category: e.target.value as any }))}
+                      className="input"
+                    >
+                      <option value="technical">Technique</option>
+                      <option value="billing">Facturation</option>
+                      <option value="feature">Fonctionnalité</option>
+                      <option value="bug">Bug</option>
+                      <option value="other">Autre</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Priorité</label>
+                    <select
+                      value={newTicket.priority}
+                      onChange={(e) => setNewTicket(prev => ({ ...prev, priority: e.target.value as any }))}
+                      className="input"
+                    >
+                      <option value="low">Faible</option>
+                      <option value="medium">Moyenne</option>
+                      <option value="high">Élevée</option>
+                      <option value="urgent">Urgente</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 mt-6">
+                <button
+                  onClick={() => setShowNewTicketModal(false)}
+                  className="btn-outline"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleCreateTicket}
+                  disabled={!newTicket.title.trim() || !newTicket.description.trim()}
+                  className="btn-primary"
+                >
+                  Créer le ticket
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

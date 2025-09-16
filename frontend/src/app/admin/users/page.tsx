@@ -2,19 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  UsersIcon, 
   MagnifyingGlassIcon,
   FunnelIcon,
-  PlusIcon,
   EyeIcon,
-  PencilIcon,
-  CheckIcon,
-  XMarkIcon,
+  UserPlusIcon,
   ShieldCheckIcon,
   ShieldExclamationIcon,
   EnvelopeIcon,
   PhoneIcon,
-  CalendarIcon
+  CalendarDaysIcon,
+  UserIcon
 } from '@heroicons/react/24/outline';
 
 interface User {
@@ -23,111 +20,107 @@ interface User {
   lastName: string;
   email: string;
   phone?: string;
-  role: 'admin' | 'owner' | 'manager' | 'user';
-  status: 'active' | 'inactive' | 'pending' | 'banned';
+  role: 'user' | 'venue_owner' | 'organizer' | 'admin';
+  isActive: boolean;
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   lastLoginAt?: string;
   createdAt: string;
-  avatar?: string;
-  location?: string;
-  totalEvents?: number;
-  totalBookings?: number;
+  totalBookings: number;
+  totalSpent: number;
 }
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
 
   useEffect(() => {
     // Simuler le chargement des données
     setTimeout(() => {
-      setUsers([
+      const mockUsers: User[] = [
         {
           id: '1',
           firstName: 'Marie',
           lastName: 'Koné',
-          email: 'marie.kone@example.com',
-          phone: '+225 07 12 34 56 78',
-          role: 'owner',
-          status: 'active',
+          email: 'marie.kone@email.com',
+          phone: '+2250701234567',
+          role: 'user',
+          isActive: true,
           isEmailVerified: true,
           isPhoneVerified: true,
-          lastLoginAt: '2024-01-15T10:30:00',
-          createdAt: '2024-01-10',
-          location: 'Abidjan, Côte d\'Ivoire',
-          totalEvents: 5,
+          lastLoginAt: '2024-01-15T10:30:00Z',
+          createdAt: '2024-01-01T00:00:00Z',
           totalBookings: 12,
+          totalSpent: 150000
         },
         {
           id: '2',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@example.com',
-          phone: '+225 07 98 76 54 32',
-          role: 'manager',
-          status: 'active',
+          firstName: 'Jean',
+          lastName: 'Dupont',
+          email: 'jean.dupont@email.com',
+          phone: '+2250701234568',
+          role: 'venue_owner',
+          isActive: true,
           isEmailVerified: true,
           isPhoneVerified: false,
-          lastLoginAt: '2024-01-14T15:45:00',
-          createdAt: '2024-01-08',
-          location: 'Abidjan, Côte d\'Ivoire',
-          totalEvents: 3,
-          totalBookings: 8,
+          lastLoginAt: '2024-01-14T16:45:00Z',
+          createdAt: '2023-12-15T00:00:00Z',
+          totalBookings: 0,
+          totalSpent: 0
         },
         {
           id: '3',
-          firstName: 'Admin',
-          lastName: 'User',
-          email: 'admin@lumina.africa',
-          phone: '+225 07 11 22 33 44',
-          role: 'admin',
-          status: 'active',
+          firstName: 'Fatou',
+          lastName: 'Sall',
+          email: 'fatou.sall@email.com',
+          phone: '+2250701234569',
+          role: 'organizer',
+          isActive: true,
           isEmailVerified: true,
           isPhoneVerified: true,
-          lastLoginAt: '2024-01-15T14:20:00',
-          createdAt: '2024-01-01',
-          location: 'Abidjan, Côte d\'Ivoire',
-          totalEvents: 0,
-          totalBookings: 0,
+          lastLoginAt: '2024-01-13T09:15:00Z',
+          createdAt: '2023-11-20T00:00:00Z',
+          totalBookings: 8,
+          totalSpent: 95000
         },
         {
           id: '4',
-          firstName: 'Fatou',
+          firstName: 'Moussa',
           lastName: 'Diop',
-          email: 'fatou.diop@example.com',
+          email: 'moussa.diop@email.com',
+          phone: '+2250701234570',
           role: 'user',
-          status: 'pending',
+          isActive: false,
           isEmailVerified: false,
           isPhoneVerified: false,
-          createdAt: '2024-01-15',
-          location: 'Dakar, Sénégal',
-          totalEvents: 0,
-          totalBookings: 0,
+          lastLoginAt: '2024-01-10T14:20:00Z',
+          createdAt: '2024-01-05T00:00:00Z',
+          totalBookings: 3,
+          totalSpent: 25000
         },
         {
           id: '5',
-          firstName: 'Ahmed',
+          firstName: 'Aminata',
           lastName: 'Traoré',
-          email: 'ahmed.traore@example.com',
-          phone: '+225 07 55 66 77 88',
-          role: 'user',
-          status: 'banned',
+          email: 'aminata.traore@email.com',
+          phone: '+2250701234571',
+          role: 'admin',
+          isActive: true,
           isEmailVerified: true,
           isPhoneVerified: true,
-          lastLoginAt: '2024-01-10T09:15:00',
-          createdAt: '2024-01-05',
-          location: 'Bouaké, Côte d\'Ivoire',
-          totalEvents: 0,
-          totalBookings: 2,
-        },
-      ]);
+          lastLoginAt: '2024-01-15T08:30:00Z',
+          createdAt: '2023-10-01T00:00:00Z',
+          totalBookings: 0,
+          totalSpent: 0
+        }
+      ];
+      setUsers(mockUsers);
+      setFilteredUsers(mockUsers);
       setIsLoading(false);
     }, 1000);
   }, []);
@@ -135,87 +128,86 @@ export default function UsersPage() {
   useEffect(() => {
     let filtered = users;
 
-    // Filtre par recherche
-    if (searchTerm) {
+    if (searchQuery) {
       filtered = filtered.filter(user =>
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.phone && user.phone.includes(searchTerm))
+        user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (user.phone && user.phone.includes(searchQuery))
       );
     }
 
-    // Filtre par rôle
     if (roleFilter !== 'all') {
       filtered = filtered.filter(user => user.role === roleFilter);
     }
 
-    // Filtre par statut
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(user => user.status === statusFilter);
+      if (statusFilter === 'active') {
+        filtered = filtered.filter(user => user.isActive);
+      } else if (statusFilter === 'inactive') {
+        filtered = filtered.filter(user => !user.isActive);
+      } else if (statusFilter === 'unverified') {
+        filtered = filtered.filter(user => !user.isEmailVerified || !user.isPhoneVerified);
+      }
     }
 
     setFilteredUsers(filtered);
-  }, [users, searchTerm, roleFilter, statusFilter]);
+  }, [users, searchQuery, roleFilter, statusFilter]);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+    }).format(amount);
+  };
 
   const getRoleBadge = (role: string) => {
     const roleConfig = {
-      admin: { color: 'red', text: 'Administrateur', icon: ShieldCheckIcon },
-      owner: { color: 'purple', text: 'Propriétaire', icon: ShieldCheckIcon },
-      manager: { color: 'blue', text: 'Gestionnaire', icon: ShieldExclamationIcon },
-      user: { color: 'green', text: 'Utilisateur', icon: UsersIcon },
+      user: { color: 'blue', text: 'Utilisateur' },
+      venue_owner: { color: 'green', text: 'Propriétaire' },
+      organizer: { color: 'purple', text: 'Organisateur' },
+      admin: { color: 'red', text: 'Admin' },
     };
 
     const config = roleConfig[role as keyof typeof roleConfig];
-    const Icon = config.icon;
-
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
-        <Icon className="h-3 w-3 mr-1" />
         {config.text}
       </span>
     );
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      active: { color: 'green', text: 'Actif', icon: CheckIcon },
-      inactive: { color: 'gray', text: 'Inactif', icon: XMarkIcon },
-      pending: { color: 'yellow', text: 'En attente', icon: CalendarIcon },
-      banned: { color: 'red', text: 'Banni', icon: XMarkIcon },
-    };
-
-    const config = statusConfig[status as keyof typeof statusConfig];
-    const Icon = config.icon;
-
-    return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
-        <Icon className="h-3 w-3 mr-1" />
-        {config.text}
+  const getStatusBadge = (isActive: boolean) => {
+    return isActive ? (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        Actif
+      </span>
+    ) : (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+        Inactif
       </span>
     );
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const handleSelectAll = () => {
+    if (selectedUsers.length === filteredUsers.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(filteredUsers.map(user => user.id));
+    }
   };
 
-  const handleStatusChange = (userId: string, newStatus: string) => {
-    setUsers(prev => prev.map(user => 
-      user.id === userId ? { ...user, status: newStatus as any } : user
-    ));
+  const handleSelectUser = (userId: string) => {
+    setSelectedUsers(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
   };
 
-  const handleRoleChange = (userId: string, newRole: string) => {
-    setUsers(prev => prev.map(user => 
-      user.id === userId ? { ...user, role: newRole as any } : user
-    ));
+  const handleBulkAction = (action: string) => {
+    console.log(`Bulk action: ${action} on users:`, selectedUsers);
+    // Implémenter les actions en lot
   };
 
   if (isLoading) {
@@ -229,121 +221,118 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Gestion des utilisateurs</h1>
           <p className="mt-2 text-gray-600">
-            Gérez les comptes utilisateurs et leurs permissions
+            Gérez tous les utilisateurs de la plateforme
           </p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-          <PlusIcon className="h-5 w-5 mr-2" />
-          Créer un utilisateur
-        </button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-3 rounded-lg bg-blue-100">
-              <UsersIcon className="h-6 w-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Utilisateurs</p>
-              <p className="text-2xl font-bold text-gray-900">{users.length}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-3 rounded-lg bg-green-100">
-              <CheckIcon className="h-6 w-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Actifs</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter(u => u.status === 'active').length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-3 rounded-lg bg-yellow-100">
-              <CalendarIcon className="h-6 w-6 text-yellow-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">En attente</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter(u => u.status === 'pending').length}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="p-3 rounded-lg bg-red-100">
-              <XMarkIcon className="h-6 w-6 text-red-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Bannis</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter(u => u.status === 'banned').length}
-              </p>
-            </div>
-          </div>
+        <div className="flex space-x-2">
+          <button className="btn-outline">
+            <FunnelIcon className="w-4 h-4 mr-2" />
+            Exporter
+          </button>
+          <button className="btn-primary">
+            <UserPlusIcon className="w-4 h-4 mr-2" />
+            Ajouter un utilisateur
+          </button>
         </div>
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Rechercher un utilisateur..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rechercher
+            </label>
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Nom, email, téléphone..."
+                className="input pl-10"
+              />
+            </div>
           </div>
 
-          {/* Role Filter */}
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="all">Tous les rôles</option>
-            <option value="admin">Administrateur</option>
-            <option value="owner">Propriétaire</option>
-            <option value="manager">Gestionnaire</option>
-            <option value="user">Utilisateur</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rôle
+            </label>
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="input"
+            >
+              <option value="all">Tous les rôles</option>
+              <option value="user">Utilisateur</option>
+              <option value="venue_owner">Propriétaire</option>
+              <option value="organizer">Organisateur</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
-          {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="all">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="inactive">Inactif</option>
-            <option value="pending">En attente</option>
-            <option value="banned">Banni</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Statut
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="active">Actif</option>
+              <option value="inactive">Inactif</option>
+              <option value="unverified">Non vérifié</option>
+            </select>
+          </div>
 
-          {/* Results count */}
-          <div className="flex items-center text-sm text-gray-600">
-            <FunnelIcon className="h-4 w-4 mr-2" />
-            {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? 's' : ''} trouvé{filteredUsers.length > 1 ? 's' : ''}
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setRoleFilter('all');
+                setStatusFilter('all');
+              }}
+              className="btn-outline w-full"
+            >
+              Effacer les filtres
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Bulk Actions */}
+      {selectedUsers.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-blue-800">
+              {selectedUsers.length} utilisateur(s) sélectionné(s)
+            </span>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleBulkAction('activate')}
+                className="btn-sm bg-green-600 text-white hover:bg-green-700"
+              >
+                <ShieldCheckIcon className="w-4 h-4 mr-1" />
+                Activer
+              </button>
+              <button
+                onClick={() => handleBulkAction('deactivate')}
+                className="btn-sm bg-red-600 text-white hover:bg-red-700"
+              >
+                <ShieldExclamationIcon className="w-4 h-4 mr-1" />
+                Désactiver
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Users Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -351,6 +340,14 @@ export default function UsersPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                    onChange={handleSelectAll}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Utilisateur
                 </th>
@@ -378,35 +375,39 @@ export default function UsersPage() {
               {filteredUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={() => handleSelectUser(user.id)}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                        {user.avatar ? (
-                          <img className="h-10 w-10 rounded-full" src={user.avatar} alt="" />
-                        ) : (
-                          <span className="text-sm font-medium text-gray-700">
-                            {user.firstName[0]}{user.lastName[0]}
-                          </span>
-                        )}
+                      <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                        <span className="text-primary-600 font-medium">
+                          {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                        </span>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
                           {user.firstName} {user.lastName}
                         </div>
                         <div className="text-sm text-gray-500">
-                          Inscrit le {new Date(user.createdAt).toLocaleDateString()}
+                          {user.totalBookings} réservations • {formatCurrency(user.totalSpent)}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
+                    <div className="space-y-1">
                       <div className="flex items-center text-sm text-gray-900">
-                        <EnvelopeIcon className="h-4 w-4 mr-2 text-gray-400" />
+                        <EnvelopeIcon className="w-4 h-4 text-gray-400 mr-2" />
                         {user.email}
                       </div>
                       {user.phone && (
-                        <div className="flex items-center text-sm text-gray-500 mt-1">
-                          <PhoneIcon className="h-4 w-4 mr-2 text-gray-400" />
+                        <div className="flex items-center text-sm text-gray-500">
+                          <PhoneIcon className="w-4 h-4 text-gray-400 mr-2" />
                           {user.phone}
                         </div>
                       )}
@@ -416,65 +417,52 @@ export default function UsersPage() {
                     {getRoleBadge(user.role)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(user.status)}
+                    {getStatusBadge(user.isActive)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        user.isEmailVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        Email {user.isEmailVerified ? '✓' : '✗'}
-                      </span>
-                      {user.phone && (
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          user.isPhoneVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          Tél {user.isPhoneVerified ? '✓' : '✗'}
+                    <div className="flex space-x-2">
+                      {user.isEmailVerified ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Email ✓
                         </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Email ✗
+                        </span>
+                      )}
+                      {user.phone && (
+                        user.isPhoneVerified ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Tél ✓
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Tél ✗
+                          </span>
+                        )
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div>
-                      <div>Événements: {user.totalEvents || 0}</div>
-                      <div>Réservations: {user.totalBookings || 0}</div>
-                      {user.lastLoginAt && (
-                        <div className="text-xs text-gray-500">
-                          Dernière connexion: {formatDate(user.lastLoginAt)}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {user.lastLoginAt ? (
+                        <div className="flex items-center">
+                          <CalendarDaysIcon className="w-4 h-4 text-gray-400 mr-2" />
+                          {new Date(user.lastLoginAt).toLocaleDateString('fr-FR')}
                         </div>
+                      ) : (
+                        'Jamais connecté'
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowModal(true);
-                        }}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <EyeIcon className="h-4 w-4" />
+                    <div className="flex space-x-2">
+                      <button className="text-primary-600 hover:text-primary-900">
+                        <EyeIcon className="w-4 h-4" />
                       </button>
                       <button className="text-gray-600 hover:text-gray-900">
-                        <PencilIcon className="h-4 w-4" />
+                        <EnvelopeIcon className="w-4 h-4" />
                       </button>
-                      {user.status === 'pending' && (
-                        <button
-                          onClick={() => handleStatusChange(user.id, 'active')}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          <CheckIcon className="h-4 w-4" />
-                        </button>
-                      )}
-                      {user.status === 'active' && (
-                        <button
-                          onClick={() => handleStatusChange(user.id, 'banned')}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <XMarkIcon className="h-4 w-4" />
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>
@@ -482,141 +470,48 @@ export default function UsersPage() {
             </tbody>
           </table>
         </div>
+
+        {filteredUsers.length === 0 && (
+          <div className="text-center py-12">
+            <UserIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun utilisateur trouvé</h3>
+            <p className="text-gray-500">Aucun utilisateur ne correspond à vos critères de recherche.</p>
+          </div>
+        )}
       </div>
 
-      {/* User Details Modal */}
-      {showModal && selectedUser && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Détails de l'utilisateur
-                </h3>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XMarkIcon className="h-6 w-6" />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center">
-                    {selectedUser.avatar ? (
-                      <img className="h-16 w-16 rounded-full" src={selectedUser.avatar} alt="" />
-                    ) : (
-                      <span className="text-lg font-medium text-gray-700">
-                        {selectedUser.firstName[0]}{selectedUser.lastName[0]}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-semibold text-gray-900">
-                      {selectedUser.firstName} {selectedUser.lastName}
-                    </h4>
-                    <p className="text-gray-600">{selectedUser.email}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Rôle</label>
-                    <div className="mt-1">{getRoleBadge(selectedUser.role)}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Statut</label>
-                    <div className="mt-1">{getStatusBadge(selectedUser.status)}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Téléphone</label>
-                    <p className="text-sm text-gray-900">{selectedUser.phone || 'Non renseigné'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Localisation</label>
-                    <p className="text-sm text-gray-900">{selectedUser.location || 'Non renseignée'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Email vérifié</label>
-                    <p className="text-sm text-gray-900">{selectedUser.isEmailVerified ? 'Oui' : 'Non'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Téléphone vérifié</label>
-                    <p className="text-sm text-gray-900">{selectedUser.isPhoneVerified ? 'Oui' : 'Non'}</p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Événements créés</label>
-                    <p className="text-sm text-gray-900">{selectedUser.totalEvents || 0}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Réservations</label>
-                    <p className="text-sm text-gray-900">{selectedUser.totalBookings || 0}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Date d'inscription</label>
-                  <p className="text-sm text-gray-900">{formatDate(selectedUser.createdAt)}</p>
-                </div>
-                
-                {selectedUser.lastLoginAt && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Dernière connexion</label>
-                    <p className="text-sm text-gray-900">{formatDate(selectedUser.lastLoginAt)}</p>
-                  </div>
-                )}
-              </div>
-              
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Fermer
-                </button>
-                {selectedUser.status === 'pending' && (
-                  <button
-                    onClick={() => {
-                      handleStatusChange(selectedUser.id, 'active');
-                      setShowModal(false);
-                    }}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700"
-                  >
-                    Activer
-                  </button>
-                )}
-                {selectedUser.status === 'active' && (
-                  <button
-                    onClick={() => {
-                      handleStatusChange(selectedUser.id, 'banned');
-                      setShowModal(false);
-                    }}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700"
-                  >
-                    Bannir
-                  </button>
-                )}
-                {selectedUser.status === 'banned' && (
-                  <button
-                    onClick={() => {
-                      handleStatusChange(selectedUser.id, 'active');
-                      setShowModal(false);
-                    }}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700"
-                  >
-                    Réactiver
-                  </button>
-                )}
-              </div>
-            </div>
+      {/* Pagination */}
+      <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <div className="flex-1 flex justify-between sm:hidden">
+          <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Précédent
+          </button>
+          <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            Suivant
+          </button>
+        </div>
+        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm text-gray-700">
+              Affichage de <span className="font-medium">1</span> à <span className="font-medium">{filteredUsers.length}</span> sur{' '}
+              <span className="font-medium">{filteredUsers.length}</span> résultats
+            </p>
+          </div>
+          <div>
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+              <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Précédent
+              </button>
+              <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                1
+              </button>
+              <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                Suivant
+              </button>
+            </nav>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
-

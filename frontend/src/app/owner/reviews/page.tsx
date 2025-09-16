@@ -2,136 +2,151 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  StarIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
-  EyeIcon,
+  StarIcon,
+  UserIcon,
+  CalendarDaysIcon,
   ChatBubbleLeftRightIcon,
+  EyeIcon,
+  ReplyIcon,
   FlagIcon,
   CheckCircleIcon,
-  XCircleIcon,
-  ExclamationTriangleIcon,
-  HeartIcon,
-  HandThumbUpIcon,
-  HandThumbDownIcon,
-  CalendarDaysIcon,
-  UserIcon
+  XCircleIcon
 } from '@heroicons/react/24/outline';
-import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
 interface Review {
   id: string;
   customerName: string;
+  customerEmail: string;
   customerAvatar?: string;
   rating: number;
+  title: string;
   comment: string;
-  date: string;
   eventName?: string;
-  status: 'pending' | 'approved' | 'rejected' | 'flagged';
+  eventDate: string;
+  createdAt: string;
+  status: 'pending' | 'approved' | 'rejected';
   response?: string;
   responseDate?: string;
+  isVerified: boolean;
   helpful: number;
   notHelpful: number;
-  isVerified: boolean;
 }
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [filteredReviews, setFilteredReviews] = useState<Review[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [ratingFilter, setRatingFilter] = useState<string>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [ratingFilter, setRatingFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedReviews, setSelectedReviews] = useState<string[]>([]);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [responseText, setResponseText] = useState('');
-  const [showResponseModal, setShowResponseModal] = useState(false);
 
-  // Données de test
   useEffect(() => {
+    // Simuler le chargement des données
+    setTimeout(() => {
     const mockReviews: Review[] = [
       {
         id: '1',
-        customerName: 'Fatou Diallo',
-        customerAvatar: '/avatars/fatou.jpg',
+          customerName: 'Marie Koné',
+          customerEmail: 'marie.kone@email.com',
+          customerAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100',
         rating: 5,
-        comment: 'Excellent restaurant ! La nourriture était délicieuse et le service impeccable. Je recommande vivement.',
-        date: '2024-01-15',
-        eventName: 'Dîner romantique',
+          title: 'Excellente soirée !',
+          comment: 'Une soirée parfaite avec une ambiance chaleureuse et un service impeccable. La vue depuis le rooftop est magnifique. Je recommande vivement !',
+          eventName: 'Soirée Jazz au Rooftop',
+          eventDate: '2024-01-20',
+          createdAt: '2024-01-21T10:30:00Z',
         status: 'approved',
-        response: 'Merci beaucoup Fatou ! Nous sommes ravis que vous ayez passé un excellent moment.',
-        responseDate: '2024-01-16',
+          response: 'Merci beaucoup Marie ! Nous sommes ravis que vous ayez passé un excellent moment. Au plaisir de vous revoir bientôt !',
+          responseDate: '2024-01-21T14:30:00Z',
+          isVerified: true,
         helpful: 12,
-        notHelpful: 1,
-        isVerified: true
+          notHelpful: 1
       },
       {
         id: '2',
-        customerName: 'Moussa Traoré',
+          customerName: 'Jean Dupont',
+          customerEmail: 'jean.dupont@email.com',
         rating: 4,
-        comment: 'Très bon restaurant, ambiance agréable. Seul bémol : l\'attente était un peu longue.',
-        date: '2024-01-14',
+          title: 'Très bon restaurant',
+          comment: 'La nourriture était délicieuse et le service rapide. Seul bémol : un peu bruyant pour un déjeuner d\'affaires.',
         eventName: 'Déjeuner d\'affaires',
+          eventDate: '2024-01-18',
+          createdAt: '2024-01-18T15:45:00Z',
         status: 'approved',
-        response: 'Merci Moussa ! Nous travaillons sur l\'optimisation de nos temps de service.',
-        responseDate: '2024-01-15',
+          isVerified: true,
         helpful: 8,
-        notHelpful: 2,
-        isVerified: true
+          notHelpful: 2
       },
       {
         id: '3',
-        customerName: 'Aminata Koné',
-        rating: 2,
-        comment: 'Service très lent et nourriture tiède. Décevant pour le prix payé.',
-        date: '2024-01-13',
-        status: 'pending',
-        helpful: 3,
-        notHelpful: 5,
-        isVerified: false
+          customerName: 'Fatou Sall',
+          customerEmail: 'fatou.sall@email.com',
+          rating: 5,
+          title: 'Anniversaire mémorable',
+          comment: 'Merci pour cette soirée d\'anniversaire parfaite ! L\'équipe a été aux petits soins et a rendu cette célébration inoubliable.',
+          eventName: 'Anniversaire Fatou',
+          eventDate: '2024-01-22',
+          createdAt: '2024-01-23T09:15:00Z',
+          status: 'approved',
+          response: 'Merci Fatou ! Nous sommes heureux d\'avoir contribué à votre anniversaire. Bonne continuation !',
+          responseDate: '2024-01-23T11:00:00Z',
+          isVerified: true,
+          helpful: 15,
+          notHelpful: 0
       },
       {
         id: '4',
-        customerName: 'Ibrahim Ouattara',
-        rating: 5,
-        comment: 'Parfait ! Tout était excellent, de l\'accueil au dessert. À refaire absolument !',
-        date: '2024-01-12',
-        eventName: 'Anniversaire',
-        status: 'approved',
-        response: 'Merci Ibrahim ! Nous sommes heureux d\'avoir contribué à votre célébration.',
-        responseDate: '2024-01-13',
-        helpful: 15,
-        notHelpful: 0,
-        isVerified: true
+          customerName: 'Moussa Diop',
+          customerEmail: 'moussa.diop@email.com',
+          rating: 2,
+          title: 'Décevant',
+          comment: 'L\'événement a été annulé au dernier moment sans explication claire. Très décevant.',
+          eventName: 'Soirée Hip-Hop',
+          eventDate: '2024-01-19',
+          createdAt: '2024-01-19T20:30:00Z',
+          status: 'pending',
+          isVerified: false,
+          helpful: 3,
+          notHelpful: 8
       },
       {
         id: '5',
-        customerName: 'Anonyme',
-        rating: 1,
-        comment: 'Très mauvais service, personnel impoli. Je ne reviendrai jamais.',
-        date: '2024-01-11',
-        status: 'flagged',
-        helpful: 1,
-        notHelpful: 8,
-        isVerified: false
+          customerName: 'Aminata Traoré',
+          customerEmail: 'aminata.traore@email.com',
+          rating: 5,
+          title: 'Pièce de théâtre magnifique',
+          comment: 'Une représentation exceptionnelle ! Les acteurs étaient brillants et la mise en scène parfaite. Un moment culturel inoubliable.',
+          eventName: 'Pièce de théâtre',
+          eventDate: '2024-01-25',
+          createdAt: '2024-01-26T08:20:00Z',
+          status: 'approved',
+          isVerified: true,
+          helpful: 20,
+          notHelpful: 1
       }
     ];
     setReviews(mockReviews);
     setFilteredReviews(mockReviews);
+      setIsLoading(false);
+    }, 1000);
   }, []);
 
-  // Filtrage des avis
   useEffect(() => {
     let filtered = reviews;
 
-    if (searchTerm) {
+    if (searchQuery) {
       filtered = filtered.filter(review => 
-        review.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        review.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (review.eventName && review.eventName.toLowerCase().includes(searchTerm.toLowerCase()))
+        review.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        review.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        review.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (review.eventName && review.eventName.toLowerCase().includes(searchQuery.toLowerCase()))
       );
-    }
-
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(review => review.status === statusFilter);
     }
 
     if (ratingFilter !== 'all') {
@@ -139,172 +154,212 @@ export default function ReviewsPage() {
       filtered = filtered.filter(review => review.rating === rating);
     }
 
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(review => review.status === statusFilter);
+    }
+
     setFilteredReviews(filtered);
-  }, [reviews, searchTerm, statusFilter, ratingFilter]);
+  }, [reviews, searchQuery, ratingFilter, statusFilter]);
 
-  const handleStatusChange = (reviewId: string, newStatus: 'approved' | 'rejected' | 'flagged') => {
-    setReviews(prev => prev.map(review => 
-      review.id === reviewId ? { ...review, status: newStatus } : review
-    ));
-  };
-
-  const handleResponse = (review: Review) => {
-    setSelectedReview(review);
-    setResponseText(review.response || '');
-    setShowResponseModal(true);
-  };
-
-  const submitResponse = () => {
-    if (selectedReview && responseText.trim()) {
-      setReviews(prev => prev.map(review => 
-        review.id === selectedReview.id 
-          ? { 
-              ...review, 
-              response: responseText.trim(),
-              responseDate: new Date().toISOString().split('T')[0]
-            } 
-          : review
-      ));
-      setShowResponseModal(false);
-      setResponseText('');
-      setSelectedReview(null);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      case 'flagged': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'approved': return <CheckCircleIcon className="w-4 h-4" />;
-      case 'pending': return <ExclamationTriangleIcon className="w-4 h-4" />;
-      case 'rejected': return <XCircleIcon className="w-4 h-4" />;
-      case 'flagged': return <FlagIcon className="w-4 h-4" />;
-      default: return null;
-    }
-  };
-
-  const renderStars = (rating: number) => {
+  const getRatingStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <StarIconSolid
+      <StarIcon
         key={i}
-        className={`w-4 h-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+        className={`w-4 h-4 ${
+          i < rating ? 'text-yellow-400' : 'text-gray-300'
+        }`}
       />
     ));
   };
 
-  const stats = {
-    total: reviews.length,
-    average: reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : '0.0',
-    pending: reviews.filter(r => r.status === 'pending').length,
-    flagged: reviews.filter(r => r.status === 'flagged').length
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      pending: { color: 'yellow', text: 'En attente' },
+      approved: { color: 'green', text: 'Approuvé' },
+      rejected: { color: 'red', text: 'Rejeté' },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig];
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
+        {config.text}
+      </span>
+    );
   };
+
+  const handleSelectAll = () => {
+    if (selectedReviews.length === filteredReviews.length) {
+      setSelectedReviews([]);
+    } else {
+      setSelectedReviews(filteredReviews.map(review => review.id));
+    }
+  };
+
+  const handleSelectReview = (reviewId: string) => {
+    setSelectedReviews(prev =>
+      prev.includes(reviewId)
+        ? prev.filter(id => id !== reviewId)
+        : [...prev, reviewId]
+    );
+  };
+
+  const handleViewReview = (review: Review) => {
+    setSelectedReview(review);
+    setResponseText(review.response || '');
+    setShowModal(true);
+  };
+
+  const handleApproveReview = (reviewId: string) => {
+    setReviews(prev =>
+      prev.map(review =>
+        review.id === reviewId
+          ? { ...review, status: 'approved' as const }
+          : review
+      )
+    );
+  };
+
+  const handleRejectReview = (reviewId: string) => {
+    setReviews(prev =>
+      prev.map(review =>
+        review.id === reviewId
+          ? { ...review, status: 'rejected' as const }
+          : review
+      )
+    );
+  };
+
+  const handleSubmitResponse = () => {
+    if (selectedReview && responseText.trim()) {
+      setReviews(prev =>
+        prev.map(review =>
+        review.id === selectedReview.id 
+          ? { 
+              ...review, 
+              response: responseText.trim(),
+                responseDate: new Date().toISOString()
+            } 
+          : review
+        )
+      );
+      setShowModal(false);
+    }
+  };
+
+  const handleBulkAction = (action: string) => {
+    console.log(`Bulk action: ${action} on reviews:`, selectedReviews);
+    // Implémenter les actions en lot
+  };
+
+  const averageRating = reviews.length > 0 
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length 
+    : 0;
+
+  const totalReviews = reviews.length;
+  const approvedReviews = reviews.filter(r => r.status === 'approved').length;
+  const pendingReviews = reviews.filter(r => r.status === 'pending').length;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Avis & E-réputation</h1>
-          <p className="text-gray-600">Gérez les avis clients et votre réputation en ligne</p>
+          <h1 className="text-3xl font-bold text-gray-900">Gestion des avis</h1>
+          <p className="mt-2 text-gray-600">
+            Gérez les avis et réponses de vos clients
+          </p>
         </div>
-        <button className="btn-primary">
-          <ChatBubbleLeftRightIcon className="w-5 h-5 mr-2" />
-          Demander des avis
+        <div className="flex space-x-2">
+          <button className="btn-outline">
+            <FunnelIcon className="w-4 h-4 mr-2" />
+            Exporter
         </button>
+        </div>
       </div>
 
-      {/* Statistiques */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <StarIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 rounded-lg bg-blue-100">
+              <StarIcon className="h-6 w-6 text-blue-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Note moyenne</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.average}/5</p>
+              <p className="text-2xl font-bold text-gray-900">{averageRating.toFixed(1)}/5</p>
             </div>
           </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <ChatBubbleLeftRightIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 rounded-lg bg-green-100">
+              <CheckCircleIcon className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total avis</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-sm font-medium text-gray-600">Approuvés</p>
+              <p className="text-2xl font-bold text-gray-900">{approvedReviews}</p>
             </div>
           </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 rounded-lg bg-yellow-100">
+              <ClockIcon className="h-6 w-6 text-yellow-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">En attente</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+              <p className="text-2xl font-bold text-gray-900">{pendingReviews}</p>
             </div>
           </div>
         </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <FlagIcon className="w-6 h-6 text-orange-600" />
+            <div className="p-3 rounded-lg bg-purple-100">
+              <ChatBubbleLeftRightIcon className="h-6 w-6 text-purple-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Signalés</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.flagged}</p>
+              <p className="text-sm font-medium text-gray-600">Total avis</p>
+              <p className="text-2xl font-bold text-gray-900">{totalReviews}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filtres */}
-      <div className="bg-white p-6 rounded-lg border border-gray-200">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rechercher
+            </label>
             <div className="relative">
-              <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Rechercher par nom, commentaire ou événement..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Client, titre, commentaire..."
+                className="input pl-10"
               />
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="all">Tous les statuts</option>
-              <option value="pending">En attente</option>
-              <option value="approved">Approuvés</option>
-              <option value="rejected">Rejetés</option>
-              <option value="flagged">Signalés</option>
-            </select>
-
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Note
+            </label>
             <select
               value={ratingFilter}
               onChange={(e) => setRatingFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="input"
             >
               <option value="all">Toutes les notes</option>
               <option value="5">5 étoiles</option>
@@ -314,126 +369,177 @@ export default function ReviewsPage() {
               <option value="1">1 étoile</option>
             </select>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Statut
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="pending">En attente</option>
+              <option value="approved">Approuvé</option>
+              <option value="rejected">Rejeté</option>
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setRatingFilter('all');
+                setStatusFilter('all');
+              }}
+              className="btn-outline w-full"
+            >
+              Effacer les filtres
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Liste des avis */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Avis clients ({filteredReviews.length})
-          </h2>
+      {/* Bulk Actions */}
+      {selectedReviews.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-blue-800">
+              {selectedReviews.length} avis sélectionné(s)
+            </span>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleBulkAction('approve')}
+                className="btn-sm bg-green-600 text-white hover:bg-green-700"
+              >
+                <CheckCircleIcon className="w-4 h-4 mr-1" />
+                Approuver
+              </button>
+              <button
+                onClick={() => handleBulkAction('reject')}
+                className="btn-sm bg-red-600 text-white hover:bg-red-700"
+              >
+                <XCircleIcon className="w-4 h-4 mr-1" />
+                Rejeter
+              </button>
+            </div>
+          </div>
         </div>
+      )}
 
-        <div className="divide-y divide-gray-200">
+      {/* Reviews List */}
+      <div className="space-y-4">
           {filteredReviews.map((review) => (
-            <div key={review.id} className="p-6">
+          <div key={review.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4 flex-1">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+              <div className="flex-1">
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
                     {review.customerAvatar ? (
                       <img
                         src={review.customerAvatar}
                         alt={review.customerName}
-                        className="w-12 h-12 rounded-full object-cover"
+                        className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
-                      <UserIcon className="w-6 h-6 text-gray-500" />
+                      <span className="text-primary-600 font-medium">
+                        {review.customerName.charAt(0)}
+                      </span>
                     )}
                   </div>
-
                   <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-gray-900">{review.customerName}</h3>
-                      {review.isVerified && (
-                        <CheckCircleIcon className="w-4 h-4 text-green-500" />
-                      )}
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(review.status)}`}>
-                        {getStatusIcon(review.status)}
-                        <span className="ml-1">
-                          {review.status === 'approved' ? 'Approuvé' :
-                           review.status === 'pending' ? 'En attente' :
-                           review.status === 'rejected' ? 'Rejeté' : 'Signalé'}
-                        </span>
-                      </span>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-900">{review.customerName}</h3>
+                        <div className="flex items-center mt-1">
+                          <div className="flex items-center">
+                            {getRatingStars(review.rating)}
                     </div>
-
-                    <div className="flex items-center space-x-2 mb-2">
-                      <div className="flex items-center space-x-1">
-                        {renderStars(review.rating)}
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(review.date).toLocaleDateString('fr-FR')}
-                      </span>
-                      {review.eventName && (
-                        <span className="text-sm text-gray-500">
-                          • {review.eventName}
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-gray-700 mb-3">{review.comment}</p>
-
-                    {review.response && (
-                      <div className="bg-gray-50 p-4 rounded-lg mb-3">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="text-sm font-medium text-gray-900">Réponse de l'établissement</span>
-                          <span className="text-sm text-gray-500">
-                            {review.responseDate && new Date(review.responseDate).toLocaleDateString('fr-FR')}
+                          <span className="ml-2 text-sm text-gray-500">
+                            {new Date(review.createdAt).toLocaleDateString('fr-FR')}
                           </span>
+                          {review.isVerified && (
+                            <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              Vérifié
+                            </span>
+                          )}
                         </div>
-                        <p className="text-gray-700">{review.response}</p>
                       </div>
-                    )}
-
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <div className="flex items-center space-x-1">
-                        <HandThumbUpIcon className="w-4 h-4" />
-                        <span>{review.helpful}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <HandThumbDownIcon className="w-4 h-4" />
-                        <span>{review.notHelpful}</span>
+                      <div className="flex items-center space-x-2">
+                        {getStatusBadge(review.status)}
+                        <button
+                          onClick={() => handleViewReview(review)}
+                          className="text-primary-600 hover:text-primary-900"
+                        >
+                          <EyeIcon className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="mb-3">
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">{review.title}</h4>
+                  <p className="text-sm text-gray-600">{review.comment}</p>
+                </div>
+
+                {review.eventName && (
+                  <div className="mb-3">
+                    <span className="text-xs text-gray-500">Événement: </span>
+                    <span className="text-xs text-gray-900">{review.eventName}</span>
+                    <span className="text-xs text-gray-500 ml-2">
+                      ({new Date(review.eventDate).toLocaleDateString('fr-FR')})
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 text-xs text-gray-500">
+                    <span>
+                      {review.helpful} utiles
+                    </span>
+                    <span>
+                      {review.notHelpful} pas utiles
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
                   {review.status === 'pending' && (
                     <>
                       <button
-                        onClick={() => handleStatusChange(review.id, 'approved')}
-                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
-                        title="Approuver"
+                          onClick={() => handleApproveReview(review.id)}
+                          className="btn-sm bg-green-600 text-white hover:bg-green-700"
                       >
-                        <CheckCircleIcon className="w-5 h-5" />
+                          <CheckCircleIcon className="w-4 h-4 mr-1" />
+                          Approuver
                       </button>
                       <button
-                        onClick={() => handleStatusChange(review.id, 'rejected')}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                        title="Rejeter"
+                          onClick={() => handleRejectReview(review.id)}
+                          className="btn-sm bg-red-600 text-white hover:bg-red-700"
                       >
-                        <XCircleIcon className="w-5 h-5" />
+                          <XCircleIcon className="w-4 h-4 mr-1" />
+                          Rejeter
                       </button>
                     </>
                   )}
-
-                  <button
-                    onClick={() => handleResponse(review)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                    title="Répondre"
-                  >
-                    <ChatBubbleLeftRightIcon className="w-5 h-5" />
+                    <button className="btn-sm bg-blue-600 text-white hover:bg-blue-700">
+                      <ReplyIcon className="w-4 h-4 mr-1" />
+                      Répondre
                   </button>
+                  </div>
+                </div>
 
-                  <button
-                    onClick={() => handleStatusChange(review.id, 'flagged')}
-                    className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
-                    title="Signaler"
-                  >
-                    <FlagIcon className="w-5 h-5" />
-                  </button>
+                {review.response && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center mb-2">
+                      <span className="text-sm font-medium text-gray-900">Votre réponse</span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        {review.responseDate && new Date(review.responseDate).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600">{review.response}</p>
+                  </div>
+                )}
                 </div>
               </div>
             </div>
@@ -441,55 +547,92 @@ export default function ReviewsPage() {
         </div>
 
         {filteredReviews.length === 0 && (
-          <div className="p-12 text-center">
-            <ChatBubbleLeftRightIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+        <div className="text-center py-12">
+          <ChatBubbleLeftRightIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun avis trouvé</h3>
-            <p className="text-gray-600">Aucun avis ne correspond à vos critères de recherche.</p>
+          <p className="text-gray-500">Aucun avis ne correspond à vos critères de recherche.</p>
           </div>
         )}
-      </div>
 
-      {/* Modal de réponse */}
-      {showResponseModal && selectedReview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Répondre à l'avis de {selectedReview.customerName}
-            </h3>
-            
-            <div className="mb-4">
-              <div className="flex items-center space-x-1 mb-2">
-                {renderStars(selectedReview.rating)}
+      {/* Review Details Modal */}
+      {showModal && selectedReview && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Détails de l'avis</h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <XCircleIcon className="w-6 h-6" />
+                </button>
               </div>
-              <p className="text-gray-700">{selectedReview.comment}</p>
+              
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                    {selectedReview.customerAvatar ? (
+                      <img
+                        src={selectedReview.customerAvatar}
+                        alt={selectedReview.customerName}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-primary-600 font-medium">
+                        {selectedReview.customerName.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900">{selectedReview.customerName}</h4>
+                    <div className="flex items-center">
+                      {getRatingStars(selectedReview.rating)}
+                      <span className="ml-2 text-sm text-gray-500">
+                        {new Date(selectedReview.createdAt).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h5 className="text-md font-medium text-gray-900 mb-2">{selectedReview.title}</h5>
+                  <p className="text-gray-600">{selectedReview.comment}</p>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Votre réponse
-              </label>
+                {selectedReview.eventName && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Événement</label>
+                    <p className="text-sm text-gray-900">{selectedReview.eventName}</p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Réponse</label>
               <textarea
                 value={responseText}
                 onChange={(e) => setResponseText(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="input"
                 placeholder="Tapez votre réponse ici..."
               />
             </div>
 
-            <div className="flex justify-end space-x-3">
+                <div className="flex justify-end space-x-2">
               <button
-                onClick={() => setShowResponseModal(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                    onClick={() => setShowModal(false)}
+                    className="btn-outline"
               >
                 Annuler
               </button>
               <button
-                onClick={submitResponse}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                    onClick={handleSubmitResponse}
+                    className="btn-primary"
               >
-                Publier la réponse
+                    Envoyer la réponse
               </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

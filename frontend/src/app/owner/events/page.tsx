@@ -2,106 +2,160 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  CalendarDaysIcon, 
   MagnifyingGlassIcon,
   FunnelIcon,
   PlusIcon,
   EyeIcon,
   PencilIcon,
-  CheckIcon,
-  XMarkIcon,
+  TrashIcon,
+  CalendarDaysIcon,
   ClockIcon,
-  DocumentTextIcon,
+  UserIcon,
   CurrencyDollarIcon,
-  UsersIcon
+  MapPinIcon,
+  StarIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ClockIcon as ClockIconSolid
 } from '@heroicons/react/24/outline';
 
 interface Event {
   id: string;
   title: string;
   description: string;
-  category: string;
-  startDate: string;
-  endDate: string;
+  eventDate: string;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  address: string;
   price: number;
-  currency: string;
-  totalTickets: number;
-  availableTickets: number;
-  soldTickets: number;
+  capacity: number;
+  currentBookings: number;
   status: 'draft' | 'published' | 'cancelled' | 'completed';
-  isRecurring: boolean;
-  recurrencePattern?: string;
+  category: string;
   images: string[];
+  averageRating: number;
+  totalReviews: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
 
   useEffect(() => {
     // Simuler le chargement des données
     setTimeout(() => {
-      setEvents([
+      const mockEvents: Event[] = [
         {
           id: '1',
-          title: 'Soirée Jazz au Lounge',
-          description: 'Soirée jazz avec groupe local et cocktails signature',
-          category: 'lounge',
-          startDate: '2024-12-18T21:00:00',
-          endDate: '2024-12-18T01:00:00',
-          price: 15000,
-          currency: 'XOF',
-          totalTickets: 50,
-          availableTickets: 25,
-          soldTickets: 25,
+          title: 'Soirée Jazz au Rooftop',
+          description: 'Une soirée inoubliable avec les meilleurs musiciens de jazz d\'Abidjan. Ambiance chaleureuse et vue panoramique sur la ville.',
+          eventDate: '2024-01-20',
+          startTime: '19:30',
+          endTime: '23:00',
+          venue: 'Le Rooftop Abidjan',
+          address: '123 Avenue Franchet d\'Esperey, Abidjan',
+          price: 25000,
+          capacity: 120,
+          currentBookings: 45,
           status: 'published',
-          isRecurring: false,
-          images: ['/images/event-1.jpg'],
-          createdAt: '2024-01-08',
+          category: 'musique',
+          images: ['https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800'],
+          averageRating: 4.5,
+          totalReviews: 23,
+          createdAt: '2024-01-10T00:00:00Z',
+          updatedAt: '2024-01-15T00:00:00Z'
         },
         {
           id: '2',
-          title: 'Happy Hour Spécial',
-          description: 'Happy hour avec 50% de réduction sur tous les cocktails',
-          category: 'bar',
-          startDate: '2024-12-20T17:00:00',
-          endDate: '2024-12-20T19:00:00',
-          price: 0,
-          currency: 'XOF',
-          totalTickets: 100,
-          availableTickets: 80,
-          soldTickets: 20,
+          title: 'Déjeuner d\'affaires',
+          description: 'Menu spécial business avec des plats raffinés dans un cadre professionnel.',
+          eventDate: '2024-01-18',
+          startTime: '12:00',
+          endTime: '14:00',
+          venue: 'Restaurant Le Bistrot',
+          address: '456 Boulevard de la République, Abidjan',
+          price: 15000,
+          capacity: 50,
+          currentBookings: 12,
           status: 'published',
-          isRecurring: true,
-          recurrencePattern: 'weekly',
-          images: ['/images/event-2.jpg'],
-          createdAt: '2024-01-10',
+          category: 'restaurant',
+          images: ['https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'],
+          averageRating: 4.2,
+          totalReviews: 8,
+          createdAt: '2024-01-12T00:00:00Z',
+          updatedAt: '2024-01-14T00:00:00Z'
         },
         {
           id: '3',
-          title: 'Dîner Romantique',
-          description: 'Menu spécial pour couples avec musique d\'ambiance',
-          category: 'restaurant',
-          startDate: '2024-12-25T19:00:00',
-          endDate: '2024-12-25T23:00:00',
-          price: 25000,
-          currency: 'XOF',
-          totalTickets: 20,
-          availableTickets: 20,
-          soldTickets: 0,
-          status: 'draft',
-          isRecurring: false,
-          images: ['/images/event-3.jpg'],
-          createdAt: '2024-01-12',
+          title: 'Anniversaire Fatou',
+          description: 'Célébration privée avec musique live et menu personnalisé.',
+          eventDate: '2024-01-22',
+          startTime: '21:00',
+          endTime: '02:00',
+          venue: 'Club Le VIP',
+          address: '789 Rue des Jardins, Abidjan',
+          price: 35000,
+          capacity: 80,
+          currentBookings: 6,
+          status: 'published',
+          category: 'privé',
+          images: ['https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800'],
+          averageRating: 0,
+          totalReviews: 0,
+          createdAt: '2024-01-14T00:00:00Z',
+          updatedAt: '2024-01-14T00:00:00Z'
         },
-      ]);
+        {
+          id: '4',
+          title: 'Soirée Hip-Hop',
+          description: 'Concert de hip-hop avec les artistes locaux les plus talentueux.',
+          eventDate: '2024-01-19',
+          startTime: '22:00',
+          endTime: '04:00',
+          venue: 'Théâtre National',
+          address: '321 Avenue de la Paix, Abidjan',
+          price: 20000,
+          capacity: 200,
+          currentBookings: 0,
+          status: 'cancelled',
+          category: 'musique',
+          images: ['https://images.unsplash.com/photo-1571266022943-4f6767a3d179?w=800'],
+          averageRating: 0,
+          totalReviews: 0,
+          createdAt: '2024-01-13T00:00:00Z',
+          updatedAt: '2024-01-13T00:00:00Z'
+        },
+        {
+          id: '5',
+          title: 'Pièce de théâtre',
+          description: 'Représentation de la pièce "Les Noces" de Tchicaya U Tam\'si.',
+          eventDate: '2024-01-25',
+          startTime: '19:00',
+          endTime: '21:30',
+          venue: 'Théâtre National',
+          address: '321 Avenue de la Paix, Abidjan',
+          price: 15000,
+          capacity: 150,
+          currentBookings: 2,
+          status: 'draft',
+          category: 'théâtre',
+          images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800'],
+          averageRating: 0,
+          totalReviews: 0,
+          createdAt: '2024-01-12T00:00:00Z',
+          updatedAt: '2024-01-12T00:00:00Z'
+        }
+      ];
+      setEvents(mockEvents);
+      setFilteredEvents(mockEvents);
       setIsLoading(false);
     }, 1000);
   }, []);
@@ -109,81 +163,107 @@ export default function EventsPage() {
   useEffect(() => {
     let filtered = events;
 
-    // Filtre par recherche
-    if (searchTerm) {
+    if (searchQuery) {
       filtered = filtered.filter(event =>
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchTerm.toLowerCase())
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.venue.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Filtre par statut
     if (statusFilter !== 'all') {
       filtered = filtered.filter(event => event.status === statusFilter);
     }
 
-    // Filtre par catégorie
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(event => event.category === categoryFilter);
     }
 
     setFilteredEvents(filtered);
-  }, [events, searchTerm, statusFilter, categoryFilter]);
+  }, [events, searchQuery, statusFilter, categoryFilter]);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+    }).format(amount);
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      published: { color: 'green', text: 'Publié', icon: CheckIcon },
-      draft: { color: 'yellow', text: 'Brouillon', icon: DocumentTextIcon },
-      cancelled: { color: 'red', text: 'Annulé', icon: XMarkIcon },
-      completed: { color: 'gray', text: 'Terminé', icon: ClockIcon },
+      draft: { color: 'gray', text: 'Brouillon', icon: PencilIcon },
+      published: { color: 'green', text: 'Publié', icon: CheckCircleIcon },
+      cancelled: { color: 'red', text: 'Annulé', icon: XCircleIcon },
+      completed: { color: 'blue', text: 'Terminé', icon: ClockIconSolid },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
     const Icon = config.icon;
-
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="w-3 h-3 mr-1" />
         {config.text}
       </span>
     );
   };
 
-  const getCategoryLabel = (category: string) => {
-    const categories = {
-      restaurant: 'Restaurant',
-      bar: 'Bar',
-      lounge: 'Lounge',
-      club: 'Club',
-      concert: 'Concert',
-      conference: 'Conférence',
-      festival: 'Festival',
+  const getCategoryBadge = (category: string) => {
+    const categoryConfig = {
+      musique: { color: 'purple', text: 'Musique' },
+      restaurant: { color: 'orange', text: 'Restaurant' },
+      privé: { color: 'pink', text: 'Privé' },
+      théâtre: { color: 'indigo', text: 'Théâtre' },
+      sport: { color: 'green', text: 'Sport' },
+      culture: { color: 'blue', text: 'Culture' },
     };
-    return categories[category as keyof typeof categories] || category;
+
+    const config = categoryConfig[category as keyof typeof categoryConfig] || { color: 'gray', text: category };
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-800`}>
+        {config.text}
+      </span>
+    );
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  const handleSelectAll = () => {
+    if (selectedEvents.length === filteredEvents.length) {
+      setSelectedEvents([]);
+    } else {
+      setSelectedEvents(filteredEvents.map(event => event.id));
+    }
   };
 
-  const formatPrice = (price: number, currency: string) => {
-    if (price === 0) return 'Gratuit';
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: currency === 'XOF' ? 'XOF' : 'EUR',
-    }).format(price);
+  const handleSelectEvent = (eventId: string) => {
+    setSelectedEvents(prev =>
+      prev.includes(eventId)
+        ? prev.filter(id => id !== eventId)
+        : [...prev, eventId]
+    );
   };
 
-  const handleStatusChange = (eventId: string, newStatus: string) => {
-    setEvents(prev => prev.map(event => 
-      event.id === eventId ? { ...event, status: newStatus as any } : event
-    ));
+  const handleBulkAction = (action: string) => {
+    console.log(`Bulk action: ${action} on events:`, selectedEvents);
+    // Implémenter les actions en lot
+  };
+
+  const handlePublishEvent = (eventId: string) => {
+    setEvents(prev =>
+      prev.map(event =>
+        event.id === eventId
+          ? { ...event, status: 'published' as const, updatedAt: new Date().toISOString() }
+          : event
+      )
+    );
+  };
+
+  const handleCancelEvent = (eventId: string) => {
+    setEvents(prev =>
+      prev.map(event =>
+        event.id === eventId
+          ? { ...event, status: 'cancelled' as const, updatedAt: new Date().toISOString() }
+          : event
+      )
+    );
   };
 
   if (isLoading) {
@@ -197,238 +277,253 @@ export default function EventsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Mes Événements</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Gestion des événements</h1>
           <p className="mt-2 text-gray-600">
-            Gérez et organisez vos événements
+            Créez et gérez les événements de votre établissement
           </p>
         </div>
-        <button className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-          <PlusIcon className="h-5 w-5 mr-2" />
-          Créer un événement
-        </button>
+        <div className="flex space-x-2">
+          <button className="btn-outline">
+            <FunnelIcon className="w-4 h-4 mr-2" />
+            Exporter
+          </button>
+          <button className="btn-primary">
+            <PlusIcon className="w-4 h-4 mr-2" />
+            Créer un événement
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-blue-100">
+              <CalendarDaysIcon className="h-6 w-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total événements</p>
+              <p className="text-2xl font-bold text-gray-900">{events.length}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-green-100">
+              <CheckCircleIcon className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Publiés</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {events.filter(e => e.status === 'published').length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-yellow-100">
+              <ClockIcon className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Brouillons</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {events.filter(e => e.status === 'draft').length}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-purple-100">
+              <UserIcon className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Réservations</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {events.reduce((sum, e) => sum + e.currentBookings, 0)}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Rechercher un événement..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Rechercher
+            </label>
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Titre, description, lieu..."
+                className="input pl-10"
+              />
+            </div>
           </div>
 
-          {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="all">Tous les statuts</option>
-            <option value="published">Publié</option>
-            <option value="draft">Brouillon</option>
-            <option value="cancelled">Annulé</option>
-            <option value="completed">Terminé</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Statut
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="draft">Brouillon</option>
+              <option value="published">Publié</option>
+              <option value="cancelled">Annulé</option>
+              <option value="completed">Terminé</option>
+            </select>
+          </div>
 
-          {/* Category Filter */}
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="all">Toutes les catégories</option>
-            <option value="restaurant">Restaurant</option>
-            <option value="bar">Bar</option>
-            <option value="lounge">Lounge</option>
-            <option value="club">Club</option>
-            <option value="concert">Concert</option>
-            <option value="conference">Conférence</option>
-            <option value="festival">Festival</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Catégorie
+            </label>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="input"
+            >
+              <option value="all">Toutes les catégories</option>
+              <option value="musique">Musique</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="privé">Privé</option>
+              <option value="théâtre">Théâtre</option>
+              <option value="sport">Sport</option>
+              <option value="culture">Culture</option>
+            </select>
+          </div>
 
-          {/* Results count */}
-          <div className="flex items-center text-sm text-gray-600">
-            <FunnelIcon className="h-4 w-4 mr-2" />
-            {filteredEvents.length} événement{filteredEvents.length > 1 ? 's' : ''} trouvé{filteredEvents.length > 1 ? 's' : ''}
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setStatusFilter('all');
+                setCategoryFilter('all');
+              }}
+              className="btn-outline w-full"
+            >
+              Effacer les filtres
+            </button>
           </div>
         </div>
       </div>
 
+      {/* Bulk Actions */}
+      {selectedEvents.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-blue-800">
+              {selectedEvents.length} événement(s) sélectionné(s)
+            </span>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleBulkAction('publish')}
+                className="btn-sm bg-green-600 text-white hover:bg-green-700"
+              >
+                <CheckCircleIcon className="w-4 h-4 mr-1" />
+                Publier
+              </button>
+              <button
+                onClick={() => handleBulkAction('cancel')}
+                className="btn-sm bg-red-600 text-white hover:bg-red-700"
+              >
+                <XCircleIcon className="w-4 h-4 mr-1" />
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Events Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.map((event) => (
-          <div key={event.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-              <div className="flex items-center justify-center h-48 bg-gradient-to-r from-primary-400 to-primary-600">
-                <CalendarDaysIcon className="h-16 w-16 text-white" />
-              </div>
-            </div>
-            
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {getCategoryLabel(event.category)}
-                </span>
+          <div key={event.id} className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="relative">
+              <img
+                src={event.images[0] || 'https://via.placeholder.com/400x200'}
+                alt={event.title}
+                className="w-full h-48 object-cover"
+              />
+              <div className="absolute top-4 left-4">
                 {getStatusBadge(event.status)}
               </div>
-              
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{event.title}</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{event.description}</p>
-              
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center text-sm text-gray-600">
-                  <CalendarDaysIcon className="h-4 w-4 mr-2" />
-                  {formatDate(event.startDate)}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <CurrencyDollarIcon className="h-4 w-4 mr-2" />
-                  {formatPrice(event.price, event.currency)}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <UsersIcon className="h-4 w-4 mr-2" />
-                  {event.soldTickets}/{event.totalTickets} billets vendus
-                </div>
-                {event.isRecurring && (
-                  <div className="flex items-center text-sm text-blue-600">
-                    <ClockIcon className="h-4 w-4 mr-2" />
-                    Événement récurrent
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => {
-                      setSelectedEvent(event);
-                      setShowModal(true);
-                    }}
-                    className="text-blue-600 hover:text-blue-900"
-                  >
-                    <EyeIcon className="h-4 w-4" />
-                  </button>
-                  <button className="text-gray-600 hover:text-gray-900">
-                    <PencilIcon className="h-4 w-4" />
-                  </button>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  {event.status === 'draft' && (
-                    <button
-                      onClick={() => handleStatusChange(event.id, 'published')}
-                      className="text-green-600 hover:text-green-900"
-                    >
-                      <CheckIcon className="h-4 w-4" />
-                    </button>
-                  )}
-                  {event.status === 'published' && (
-                    <button
-                      onClick={() => handleStatusChange(event.id, 'cancelled')}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <XMarkIcon className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
+              <div className="absolute top-4 right-4">
+                {getCategoryBadge(event.category)}
               </div>
             </div>
-          </div>
-        ))}
-      </div>
 
-      {/* Event Details Modal */}
-      {showModal && selectedEvent && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Détails de l'événement
-                </h3>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XMarkIcon className="h-6 w-6" />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-xl font-semibold text-gray-900">
-                    {selectedEvent.title}
-                  </h4>
-                  <p className="text-gray-600 mt-1">{selectedEvent.description}</p>
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{event.title}</h3>
+              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{event.description}</p>
+
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center text-sm text-gray-500">
+                  <CalendarDaysIcon className="w-4 h-4 mr-2" />
+                  {new Date(event.eventDate).toLocaleDateString('fr-FR')}
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Catégorie</label>
-                    <p className="text-sm text-gray-900">{getCategoryLabel(selectedEvent.category)}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Statut</label>
-                    <div className="mt-1">{getStatusBadge(selectedEvent.status)}</div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Date de début</label>
-                    <p className="text-sm text-gray-900">{formatDate(selectedEvent.startDate)}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Date de fin</label>
-                    <p className="text-sm text-gray-900">{formatDate(selectedEvent.endDate)}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Prix</label>
-                    <p className="text-sm text-gray-900">{formatPrice(selectedEvent.price, selectedEvent.currency)}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Billets</label>
-                    <p className="text-sm text-gray-900">{selectedEvent.soldTickets}/{selectedEvent.totalTickets}</p>
-                  </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <ClockIcon className="w-4 h-4 mr-2" />
+                  {event.startTime} - {event.endTime}
                 </div>
-                
-                {selectedEvent.isRecurring && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Récurrence</label>
-                    <p className="text-sm text-gray-900">Événement récurrent - {selectedEvent.recurrencePattern}</p>
-                  </div>
-                )}
+                <div className="flex items-center text-sm text-gray-500">
+                  <MapPinIcon className="w-4 h-4 mr-2" />
+                  {event.venue}
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <CurrencyDollarIcon className="w-4 h-4 mr-2" />
+                  {formatCurrency(event.price)}
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <UserIcon className="w-4 h-4 mr-2" />
+                  {event.currentBookings}/{event.capacity} places
+                </div>
               </div>
-              
-              <div className="mt-6 flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Fermer
-                </button>
-                {selectedEvent.status === 'draft' && (
+
+              {event.averageRating > 0 && (
+                <div className="flex items-center mb-4">
+                  <StarIcon className="w-4 h-4 text-yellow-400 mr-1" />
+                  <span className="text-sm font-medium text-gray-900">{event.averageRating}/5</span>
+                  <span className="text-sm text-gray-500 ml-1">({event.totalReviews} avis)</span>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center">
+                <div className="flex space-x-2">
+                  <button className="text-primary-600 hover:text-primary-900">
+                    <EyeIcon className="w-4 h-4" />
+                  </button>
+                  <button className="text-gray-600 hover:text-gray-900">
+                    <PencilIcon className="w-4 h-4" />
+                  </button>
+                  <button className="text-red-600 hover:text-red-900">
+                    <TrashIcon className="w-4 h-4" />
+                  </button>
+                </div>
+                {event.status === 'draft' && (
                   <button
-                    onClick={() => {
-                      handleStatusChange(selectedEvent.id, 'published');
-                      setShowModal(false);
-                    }}
-                    className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700"
+                    onClick={() => handlePublishEvent(event.id)}
+                    className="btn-sm bg-green-600 text-white hover:bg-green-700"
                   >
                     Publier
                   </button>
                 )}
-                {selectedEvent.status === 'published' && (
+                {event.status === 'published' && (
                   <button
-                    onClick={() => {
-                      handleStatusChange(selectedEvent.id, 'cancelled');
-                      setShowModal(false);
-                    }}
-                    className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700"
+                    onClick={() => handleCancelEvent(event.id)}
+                    className="btn-sm bg-red-600 text-white hover:bg-red-700"
                   >
                     Annuler
                   </button>
@@ -436,6 +531,14 @@ export default function EventsPage() {
               </div>
             </div>
           </div>
+        ))}
+      </div>
+
+      {filteredEvents.length === 0 && (
+        <div className="text-center py-12">
+          <CalendarDaysIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun événement trouvé</h3>
+          <p className="text-gray-500">Aucun événement ne correspond à vos critères de recherche.</p>
         </div>
       )}
     </div>
