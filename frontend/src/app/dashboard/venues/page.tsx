@@ -21,6 +21,7 @@ import {
   ClockIcon
 } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+import { UserRole } from '@/types/auth';
 
 interface Venue {
   id: number;
@@ -57,8 +58,8 @@ export default function VenuesPage() {
       return;
     }
 
-    // Vérifier si l'utilisateur est un propriétaire de lieu
-    if (user?.role !== 'venue_owner' && user?.role !== 'owner' && user?.role !== 'manager') {
+    // Vérifier si l'utilisateur est un propriétaire de lieu ou organisateur
+    if (user?.role !== UserRole.VENUE_OWNER && user?.role !== UserRole.ORGANIZER) {
       router.push('/dashboard');
       return;
     }
