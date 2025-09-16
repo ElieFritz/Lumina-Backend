@@ -17,7 +17,7 @@ interface EventCardProps {
 
 export function VenueCard({ venue, onViewDetails, className = "" }: VenueCardProps) {
   const getCategoryEmoji = (category: VenueCategory) => {
-    const emojis = {
+    const emojis: Record<VenueCategory, string> = {
       [VenueCategory.RESTAURANT]: '🍽️',
       [VenueCategory.CINEMA]: '🎬',
       [VenueCategory.LOUNGE]: '🍸',
@@ -26,8 +26,9 @@ export function VenueCard({ venue, onViewDetails, className = "" }: VenueCardPro
       [VenueCategory.CLUB]: '🕺',
       [VenueCategory.THEATER]: '🎭',
       [VenueCategory.SPORTS]: '⚽',
+      [VenueCategory.OTHER]: '📍',
     };
-    return emojis[category] || '📍';
+    return emojis[category] ?? '📍';
   };
 
   return (
@@ -149,7 +150,9 @@ export function EventCard({ event, onViewDetails, className = "" }: EventCardPro
         
         <div className="flex items-center text-gray-500 mb-2">
           <MapPinIcon className="w-4 h-4 mr-1" />
-          <span className="text-sm">{event.venue.name}, {event.venue.location}</span>
+          <span className="text-sm">
+            {event.venue.name}, {typeof event.venue.location === 'string' ? event.venue.location : `${event.venue.location.lat}, ${event.venue.location.lng}`}
+          </span>
         </div>
         
         <div className="flex items-center justify-between mb-4">

@@ -15,20 +15,47 @@ import { Button } from '@/components/ui/Button';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { Event, EventStatus } from '@/types';
+import { EventStatus } from '@/types';
+
+interface UiEvent {
+  id: string;
+  title: string;
+  description: string;
+  eventDate: string;
+  endDate?: string;
+  price: number;
+  maxCapacity?: number;
+  currentBookings: number;
+  status: EventStatus;
+  images?: string[];
+  tags?: string[];
+  venue: {
+    id: string;
+    name: string;
+    location: string;
+    category: string;
+  };
+  organizer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  averageRating?: number;
+  totalReviews: number;
+}
 
 export default function EventsPage() {
   const searchParams = useSearchParams();
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<UiEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [location, setLocation] = useState(searchParams.get('location') || '');
-  const [date, setDate] = useState(searchParams.get('date') || '');
-  const [priceRange, setPriceRange] = useState(searchParams.get('price') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
+  const [location, setLocation] = useState(searchParams?.get('location') || '');
+  const [date, setDate] = useState(searchParams?.get('date') || '');
+  const [priceRange, setPriceRange] = useState(searchParams?.get('price') || '');
   const [sortBy, setSortBy] = useState('date');
 
   // Données mockées pour la démonstration
-  const mockEvents: Event[] = [
+  const mockEvents: UiEvent[] = [
     {
       id: '1',
       title: 'Concert Jazz au Rooftop',

@@ -14,11 +14,11 @@ export function useSearch(initialData: any[], filterFn: (data: any[], filters: a
   const searchParams = useSearchParams();
   const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [location, setLocation] = useState(searchParams.get('location') || '');
-  const [category, setCategory] = useState(searchParams.get('category') || '');
-  const [date, setDate] = useState(searchParams.get('date') || '');
-  const [priceRange, setPriceRange] = useState(searchParams.get('price') || '');
+  const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
+  const [location, setLocation] = useState(searchParams?.get('location') || '');
+  const [category, setCategory] = useState(searchParams?.get('category') || '');
+  const [date, setDate] = useState(searchParams?.get('date') || '');
+  const [priceRange, setPriceRange] = useState(searchParams?.get('price') || '');
   const [sortBy, setSortBy] = useState('rating');
 
   useEffect(() => {
