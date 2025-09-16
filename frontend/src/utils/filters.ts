@@ -61,7 +61,10 @@ export function filterEvents(events: Event[], filters: {
   
   if (filters.location) {
     filteredEvents = filteredEvents.filter(event =>
-      event.venue.location.toLowerCase().includes(filters.location.toLowerCase())
+      (typeof event.venue.location === 'string'
+        ? event.venue.location
+        : `${event.venue.location.lat},${event.venue.location.lng}`
+      ).toLowerCase().includes(filters.location.toLowerCase())
     );
   }
   
@@ -103,7 +106,7 @@ export function filterEvents(events: Event[], filters: {
 }
 
 export function getCategoryEmoji(category: VenueCategory): string {
-  const emojis = {
+  const emojis: Record<VenueCategory, string> = {
     [VenueCategory.RESTAURANT]: '🍽️',
     [VenueCategory.CINEMA]: '🎬',
     [VenueCategory.LOUNGE]: '🍸',
@@ -112,8 +115,9 @@ export function getCategoryEmoji(category: VenueCategory): string {
     [VenueCategory.CLUB]: '🕺',
     [VenueCategory.THEATER]: '🎭',
     [VenueCategory.SPORTS]: '⚽',
+    [VenueCategory.OTHER]: '📍',
   };
-  return emojis[category] || '📍';
+  return emojis[category] ?? '📍';
 }
 
 export function formatPrice(price: number): string {

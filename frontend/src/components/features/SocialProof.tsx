@@ -6,7 +6,6 @@ import {
   UserGroupIcon, 
   BuildingOfficeIcon,
   CurrencyDollarIcon,
-  TrendingUpIcon,
   CheckBadgeIcon
 } from '@heroicons/react/24/outline';
 

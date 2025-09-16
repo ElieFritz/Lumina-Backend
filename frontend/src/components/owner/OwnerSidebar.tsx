@@ -138,7 +138,7 @@ const menuItems: MenuItem[] = [
 ];
 
 export function OwnerSidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname() || '';
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const toggleExpanded = (itemName: string) => {
