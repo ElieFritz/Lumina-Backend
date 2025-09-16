@@ -7,8 +7,6 @@ import {
   CalendarDaysIcon,
   CreditCardIcon,
   BuildingOfficeIcon,
-  TrendingUpIcon,
-  TrendingDownIcon,
   ArrowUpIcon,
   ArrowDownIcon
 } from '@heroicons/react/24/outline';
