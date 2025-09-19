@@ -15,10 +15,10 @@
       ]
     }
   ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://lumina-africa-backend.onrender.com/api/$1"
-    }
-  ]
+        "rewrites": [
+          {
+            "source": "/api/(.*)",
+            "destination": "https://lumina-csjl.onrender.com/api/$1"
+          }
+        ]
 }
