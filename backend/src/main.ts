@@ -14,7 +14,11 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000',
+      'https://lumina-africa-frontend.vercel.app',
+      'https://lumina-africa.vercel.app'
+    ],
     credentials: true,
   });
 
@@ -41,10 +45,10 @@ async function bootstrap() {
   // Configuration du port
   const port = process.env.PORT || 3001;
   
-  await app.listen(port);
-  console.log(`🚀 Lumina Africa API is running on: http://localhost:${port}`);
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 Lumina Africa API is running on port: ${port}`);
   console.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
-  console.log(`🗄️  Database: Supabase (https://baoywgzpmndrbiagiczs.supabase.co)`);
+  console.log(`🗄️  Database: Supabase (${process.env.NEXT_PUBLIC_SUPABASE_URL})`);
   console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
 }
 
