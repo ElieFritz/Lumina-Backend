@@ -36,6 +36,8 @@
   "workspaces": [
     "backend",
     "frontend"
-  ]
+  ],
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4"
+  }
 }
-

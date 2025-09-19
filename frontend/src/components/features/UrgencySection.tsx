@@ -100,6 +100,14 @@ export function UrgencySection() {
   }, [urgencyOffers.length]);
 
   const formatTime = (time: number) => time.toString().padStart(2, '0');
+  
+  const formatPrice = (price: number) => {
+    // Utiliser un formatage cohérent pour éviter les erreurs d'hydratation
+    return price.toLocaleString('fr-FR', { 
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0 
+    });
+  };
 
   return (
     <section className="py-20 bg-gradient-to-br from-red-600 via-red-700 to-orange-600 text-white">
@@ -147,13 +155,13 @@ export function UrgencySection() {
               {/* Price */}
               <div className="text-center">
                 <div className="text-3xl font-bold text-yellow-300">
-                  {urgencyOffers[currentOffer].discountPrice.toLocaleString()} FCFA
+                  {formatPrice(urgencyOffers[currentOffer].discountPrice)} FCFA
                 </div>
                 <div className="text-lg text-red-100 line-through">
-                  {urgencyOffers[currentOffer].originalPrice.toLocaleString()} FCFA
+                  {formatPrice(urgencyOffers[currentOffer].originalPrice)} FCFA
                 </div>
                 <div className="text-sm text-red-200">
-                  Économisez {urgencyOffers[currentOffer].originalPrice - urgencyOffers[currentOffer].discountPrice} FCFA
+                  Économisez {formatPrice(urgencyOffers[currentOffer].originalPrice - urgencyOffers[currentOffer].discountPrice)} FCFA
                 </div>
               </div>
 
@@ -224,10 +232,10 @@ export function UrgencySection() {
                 <div className="flex justify-between items-center mb-4">
                   <div>
                     <div className="text-xl font-bold text-yellow-300">
-                      {offer.discountPrice.toLocaleString()} FCFA
+                      {formatPrice(offer.discountPrice)} FCFA
                     </div>
                     <div className="text-sm text-red-100 line-through">
-                      {offer.originalPrice.toLocaleString()} FCFA
+                      {formatPrice(offer.originalPrice)} FCFA
                     </div>
                   </div>
                   <div className="text-right">

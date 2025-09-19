@@ -1,0 +1,287 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  OWNER
+  MODERATOR
+}
+
+enum VenueCategory {
+  RESTAURANT
+  CINEMA
+  LOUNGE
+  CONCERT_HALL
+  THEATER
+  CLUB
+  BAR
+  CAFE
+  HOTEL
+  SPORTS
+  OTHER
+}
+
+enum VenueStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  phone     String?  @unique
+  password  String
+  firstName String
+  lastName  String
+  avatar    String?
+  dateOfBirth DateTime? @db.Date
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  isEmailVerified Boolean @default(false)
+  isPhoneVerified  Boolean @default(false)
+  emailVerificationToken String?
+  phoneVerificationCode  String?
+  resetPasswordToken     String?
+  resetPasswordExpires   DateTime?
+  lastLoginAt            DateTime?
+  preferences            Json?
+  location               String? // PostGIS point
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  reviews            Review[]
+  payments           Payment[]
+  sentFriendRequests Friendship[] @relation("FriendRequester")
+  receivedFriendRequests Friendship[] @relation("FriendAddressee")
+  venues             Venue[]
+  events             Event[]
+  promotions         Promotion[]
+  bookings           Booking[]
+  sentFriends        User[] @relation("UserFriends")
+  receivedFriends    User[] @relation("UserFriends")
+
+  @@map("users")
+}
+
+model Venue {
+  id            String        @id @default(uuid())
+  name          String        @db.VarChar(100)
+  description   String        @db.Text
+  category      VenueCategory
+  address       String        @db.VarChar(200)
+  city          String        @db.VarChar(50)
+  country       String        @db.VarChar(50)
+  postalCode    String?       @db.VarChar(10)
+  coordinates   String?       // PostGIS point
+  rating        Decimal       @default(0) @db.Decimal(3, 2)
+  reviewCount   Int           @default(0)
+  priceRange    String        @db.VarChar(10)
+  openingHours  Json?
+  amenities     String[]
+  contactInfo   Json?
+  status        VenueStatus   @default(PENDING)
+  isVerified    Boolean       @default(false)
+  isFeatured    Boolean       @default(false)
+  capacity      Int           @default(0)
+  averagePrice  Decimal?      @db.Decimal(10, 2)
+  currency      String        @default("XOF") @db.VarChar(10)
+  tags          String[]
+  notes         String?       @db.Text
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  ownerId String?
+  owner   User?   @relation(fields: [ownerId], references: [id])
+  events  Event[]
+  reviews Review[]
+  images  VenueImage[]
+  bookings Booking[]
+
+  @@map("venues")
+}
+
+model VenueImage {
+  id        String   @id @default(uuid())
+  url       String
+  alt       String?
+  isMain    Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // Relations
+  venueId String
+  venue   Venue  @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@map("venue_images")
+}
+
+model Event {
+  id          String      @id @default(uuid())
+  title       String      @db.VarChar(200)
+  description String      @db.Text
+  startDate   DateTime
+  endDate     DateTime
+  status      EventStatus @default(DRAFT)
+  price       Decimal?    @db.Decimal(10, 2)
+  currency    String      @default("XOF") @db.VarChar(10)
+  capacity    Int?
+  isPublic    Boolean     @default(true)
+  tags        String[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  organizerId String
+  organizer   User   @relation(fields: [organizerId], references: [id])
+  venueId     String
+  venue       Venue  @relation(fields: [venueId], references: [id])
+  images      EventImage[]
+  bookings    Booking[]
+
+  @@map("events")
+}
+
+model EventImage {
+  id        String   @id @default(uuid())
+  url       String
+  alt       String?
+  isMain    Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // Relations
+  eventId String
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("event_images")
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  status      BookingStatus @default(PENDING)
+  quantity    Int           @default(1)
+  totalPrice  Decimal       @db.Decimal(10, 2)
+  currency    String        @default("XOF") @db.VarChar(10)
+  notes       String?       @db.Text
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  userId  String
+  user    User  @relation(fields: [userId], references: [id])
+  eventId String
+  event   Event @relation(fields: [eventId], references: [id])
+  venueId String
+  venue   Venue @relation(fields: [venueId], references: [id])
+  payment Payment?
+
+  @@map("bookings")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int      @db.SmallInt
+  comment   String?  @db.Text
+  isVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId  String
+  user    User  @relation(fields: [userId], references: [id])
+  venueId String
+  venue   Venue @relation(fields: [venueId], references: [id])
+
+  @@unique([userId, venueId])
+  @@map("reviews")
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("XOF") @db.VarChar(10)
+  status        PaymentStatus @default(PENDING)
+  paymentMethod String        @db.VarChar(50)
+  transactionId String?       @unique
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model Friendship {
+  id          String   @id @default(uuid())
+  status      String   @default("pending") // pending, accepted, declined
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  requesterId String
+  requester   User @relation("FriendRequester", fields: [requesterId], references: [id])
+  addresseeId String
+  addressee   User @relation("FriendAddressee", fields: [addresseeId], references: [id])
+
+  @@unique([requesterId, addresseeId])
+  @@map("friendships")
+}
+
+model Promotion {
+  id          String   @id @default(uuid())
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  discount    Decimal  @db.Decimal(5, 2)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdById String
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  @@map("promotions")
+}

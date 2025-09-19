@@ -1,35 +1,24 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
-import helmet from 'helmet';
-import * as compression from 'compression';
 import { AppModule } from './app.module';
-import { DatabaseConnectionService } from './database/connection.service';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as compression from 'compression';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-  
-  // Initialize database connection
-  const databaseService = app.get(DatabaseConnectionService);
-  await databaseService.initialize();
 
-  // Security middleware
+  // Middleware de sécurité
   app.use(helmet());
   app.use(compression());
 
-  // CORS configuration
+  // CORS
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'https://lumina-africa.com',
-      'https://www.lumina-africa.com',
-    ],
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   });
 
-  // Global validation pipe
+  // Validation globale
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -38,33 +27,28 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger documentation
+  // Configuration Swagger
   const config = new DocumentBuilder()
-    .setTitle('EventLink Africa API')
-    .setDescription('API pour la plateforme EventLink Africa - Découverte et réservation d\'événements')
-    .setVersion('1.0')
+    .setTitle('Lumina Africa API')
+    .setDescription('API pour la plateforme Lumina Africa utilisant Supabase')
+    .setVersion('1.0.0')
     .addBearerAuth()
-    .addTag('auth', 'Authentification')
-    .addTag('users', 'Utilisateurs')
-    .addTag('venues', 'Établissements')
-    .addTag('events', 'Événements')
-    .addTag('reservations', 'Réservations')
-    .addTag('payments', 'Paiements')
-    .addTag('reviews', 'Avis')
-    .addTag('promotions', 'Promotions')
-    .addTag('social', 'Social')
-    .addTag('search', 'Recherche')
-    .addTag('ar', 'Réalité Augmentée')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = configService.get('PORT') || 3001;
-  await app.listen(port);
+  // Configuration du port
+  const port = process.env.PORT || 3001;
   
-  console.log(`🚀 EventLink Africa API is running on: http://localhost:${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
+  await app.listen(port);
+  console.log(`🚀 Lumina Africa API is running on: http://localhost:${port}`);
+  console.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
+  console.log(`🗄️  Database: Supabase (https://baoywgzpmndrbiagiczs.supabase.co)`);
+  console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('❌ Error starting the application:', error);
+  process.exit(1);
+});
