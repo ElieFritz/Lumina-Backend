@@ -11,14 +11,26 @@
         {
           "key": "Permissions-Policy",
           "value": "geolocation=(), microphone=(), camera=()"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://lumina-csjl.onrender.com"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
         }
       ]
     }
   ],
-        "rewrites": [
-          {
-            "source": "/api/(.*)",
-            "destination": "https://lumina-csjl.onrender.com/api/$1"
-          }
-        ]
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://lumina-csjl.onrender.com/api/$1"
+    }
+  ]
 }
