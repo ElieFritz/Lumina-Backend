@@ -18,7 +18,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://lumina-africa-backend.vercel.app/api/$1"
+      "destination": "https://lumina-africa-backend.onrender.com/api/$1"
     }
   ]
 }
