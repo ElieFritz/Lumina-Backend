@@ -3,26 +3,31 @@ services:
     name: lumina-africa-backend
     env: node
     plan: free
+    region: oregon
     buildCommand: npm install && npm run build
     startCommand: npm run start:prod
+    healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
       - key: NEXT_PUBLIC_SUPABASE_URL
-        sync: false
+        value: https://baoywgzpmndrbiagiczs.supabase.co
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
-        sync: false
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhb3l3Z3pwbW5kcmJpYWdpY3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTA2NjUsImV4cCI6MjA3MzUyNjY2NX0.KP9VMywToT5YvHikWqmTi5pO6HEWitL14-cnJ9jETYs
       - key: DATABASE_URL
-        sync: false
+        value: postgresql://postgres.baoywgzpmndrbiagiczs:Eliefritz97@aws-1-ca-central-1.pooler.supabase.com:6543/postgres
       - key: POSTGRES_HOST
-        sync: false
+        value: aws-1-ca-central-1.pooler.supabase.com
       - key: POSTGRES_PORT
-        sync: false
+        value: 6543
       - key: POSTGRES_USER
-        sync: false
+        value: postgres.baoywgzpmndrbiagiczs
       - key: POSTGRES_PASSWORD
-        sync: false
+        value: Eliefritz97
       - key: POSTGRES_DB
-        sync: false
+        value: postgres
+      - key: FRONTEND_URL
+        value: https://lumina-africa-frontend.vercel.app
