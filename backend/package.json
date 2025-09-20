@@ -5,6 +5,7 @@
   "author": "Lumina Africa Team",
   "private": true,
   "license": "MIT",
+  "main": "dist/main.js",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
