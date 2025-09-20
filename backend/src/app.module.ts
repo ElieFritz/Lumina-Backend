@@ -5,6 +5,7 @@ import { SupabaseController } from './controllers/supabase.controller';
 import { SupabaseService } from './services/supabase.service';
 import { HealthController } from './controllers/health.controller';
 import { HealthService } from './services/health.service';
+import { DebugController } from './controllers/debug.controller';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RetryInterceptor } from './common/interceptors/retry.interceptor';
 
@@ -15,7 +16,7 @@ import { RetryInterceptor } from './common/interceptors/retry.interceptor';
       envFilePath: ['.env', '.env.local', '.env.production'],
     }),
   ],
-  controllers: [SupabaseController, HealthController],
+  controllers: [SupabaseController, HealthController, DebugController],
   providers: [
     SupabaseService,
     HealthService,
