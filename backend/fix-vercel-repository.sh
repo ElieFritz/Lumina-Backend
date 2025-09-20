@@ -1,0 +1,53 @@
+#!/bin/bash
+
+echo "🔧 Correction du Repository Vercel"
+echo "=================================="
+
+echo "📋 Problème identifié :"
+echo "Vercel clone 'github.com/ElieFritz/Lumina-Backend'"
+echo "Mais nous avons poussé vers 'github.com/ElieFritz/Lumina'"
+echo ""
+
+echo "🔍 Solutions disponibles :"
+echo ""
+echo "1. **Changer la configuration Vercel (Recommandé) :**"
+echo "   - Allez sur https://vercel.com/dashboard"
+echo "   - Sélectionnez votre projet"
+echo "   - Allez dans Settings > Git"
+echo "   - Changez le repository vers: https://github.com/ElieFritz/Lumina"
+echo "   - Redéployez"
+echo ""
+
+echo "2. **Pousser vers Lumina-Backend :**"
+echo "   - Créer un remote vers Lumina-Backend"
+echo "   - Pousser les changements"
+echo ""
+
+echo "3. **Créer un nouveau projet Vercel :**"
+echo "   - Supprimer le projet actuel"
+echo "   - Créer un nouveau projet"
+echo "   - Importer https://github.com/ElieFritz/Lumina"
+echo "   - Configurer avec Root Directory: backend"
+echo ""
+
+echo "🎯 Solution recommandée : Changer le repository Vercel"
+echo ""
+echo "Étapes détaillées :"
+echo "1. Dashboard Vercel → Votre projet"
+echo "2. Settings → Git"
+echo "3. Disconnect repository"
+echo "4. Connect new repository"
+echo "5. Sélectionner: ElieFritz/Lumina"
+echo "6. Root Directory: backend"
+echo "7. Deploy"
+echo ""
+
+echo "📊 Configuration requise :"
+echo "- Repository: https://github.com/ElieFritz/Lumina"
+echo "- Root Directory: backend"
+echo "- Build Command: npm run build"
+echo "- Output Directory: dist"
+echo "- Install Command: npm install"
+echo ""
+
+echo "✅ Après correction, l'API devrait fonctionner !"
