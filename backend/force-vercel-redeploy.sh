@@ -1,0 +1,48 @@
+#!/bin/bash
+
+echo "🔄 Force Vercel Redeploy"
+echo "======================="
+
+echo "📋 Problème identifié :"
+echo "Vercel ne trouve pas les fichiers compilés dist/"
+echo "Solution : Forcer un redéploiement complet"
+echo ""
+
+echo "🔧 Étapes à suivre :"
+echo ""
+echo "1. **Allez sur le Dashboard Vercel :**"
+echo "   https://vercel.com/dashboard"
+echo ""
+echo "2. **Sélectionnez votre projet :**"
+echo "   backend-nine-omega-30"
+echo ""
+echo "3. **Allez dans l'onglet 'Deployments'**"
+echo ""
+echo "4. **Cliquez sur les 3 points (...) du dernier déploiement**"
+echo ""
+echo "5. **Sélectionnez 'Redeploy'**"
+echo ""
+echo "6. **OU créez un nouveau déploiement :**"
+echo "   - Cliquez sur 'Deploy'"
+echo "   - Sélectionnez 'Use this commit'"
+echo "   - Laissez les paramètres par défaut"
+echo ""
+
+echo "🔍 Configuration actuelle :"
+echo "- vercel.json : Configuration simplifiée"
+echo "- api/index.js : Handler NestJS optimisé"
+echo "- dist/ : Fichiers compilés présents"
+echo ""
+
+echo "✅ Après redéploiement, testez :"
+echo "curl https://backend-nine-omega-30.vercel.app/api/health"
+echo ""
+
+echo "📊 Si le problème persiste :"
+echo "1. Vérifiez les logs de build dans Vercel"
+echo "2. Vérifiez que dist/ est bien inclus"
+echo "3. Essayez de supprimer et recréer le projet"
+echo ""
+
+echo "🎯 Alternative : Déploiement via CLI"
+echo "npx vercel --prod --force"
