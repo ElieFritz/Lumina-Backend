@@ -1,0 +1,72 @@
+#!/bin/bash
+
+echo "🆕 Créer un Nouveau Projet Vercel"
+echo "================================="
+
+echo "📋 Problème identifié :"
+echo "Le projet actuel a des problèmes de configuration"
+echo "Solution : Créer un nouveau projet avec la bonne configuration"
+echo ""
+
+echo "🔧 Étapes détaillées :"
+echo ""
+echo "1. **Supprimez le projet actuel :**"
+echo "   - Allez sur https://vercel.com/dashboard"
+echo "   - Sélectionnez 'backend-nine-omega-30'"
+echo "   - Allez dans Settings > General"
+echo "   - Scroll down et cliquez sur 'Delete Project'"
+echo "   - Confirmez la suppression"
+echo ""
+
+echo "2. **Créez un nouveau projet :**"
+echo "   - Cliquez sur 'New Project'"
+echo "   - Sélectionnez 'Import Git Repository'"
+echo "   - Choisissez : https://github.com/ElieFritz/Lumina"
+echo ""
+
+echo "3. **Configuration du projet :**"
+echo "   - Project Name: lumina-backend-api"
+echo "   - Framework Preset: Other"
+echo "   - Root Directory: backend"
+echo "   - Build Command: npm run build"
+echo "   - Output Directory: dist"
+echo "   - Install Command: npm install"
+echo ""
+
+echo "4. **Variables d'environnement :**"
+echo "   Ajoutez ces variables dans l'onglet 'Environment Variables' :"
+echo ""
+echo "   NODE_ENV = production"
+echo "   DATABASE_URL = postgresql://postgres.baoywgzpmndrbiagiczs:Eliefritz97@aws-1-ca-central-1.pooler.supabase.com:6543/postgres"
+echo "   NEXT_PUBLIC_SUPABASE_URL = https://baoywgzpmndrbiagiczs.supabase.co"
+echo "   NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhb3l3Z3pwbW5kcmJpYWdpY3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTA2NjUsImV4cCI6MjA3MzUyNjY2NX0.KP9VMywToT5YvHikWqmTi5pO6HEWitL14-cnJ9jETYs"
+echo "   FRONTEND_URL = https://lumina-africa-frontend.vercel.app"
+echo ""
+
+echo "5. **Déployez :**"
+echo "   - Cliquez sur 'Deploy'"
+echo "   - Attendez 2-3 minutes"
+echo "   - Notez la nouvelle URL"
+echo ""
+
+echo "6. **Testez l'API :**"
+echo "   curl https://[NOUVELLE-URL]/api/health"
+echo ""
+
+echo "✅ Avantages du nouveau projet :"
+echo "- Configuration propre et optimisée"
+echo "- Pas de conflits avec l'ancien projet"
+echo "- Build et déploiement frais"
+echo "- Meilleure compatibilité avec NestJS"
+echo ""
+
+echo "🎯 Résultat attendu :"
+echo "L'API devrait répondre avec :"
+echo '{"status":"ok","timestamp":"2025-09-20T12:00:00.000Z","service":"Lumina Africa API","database":"Supabase","version":"1.0.0"}'
+echo ""
+
+echo "📞 Si le problème persiste :"
+echo "1. Vérifiez que le Root Directory est bien 'backend'"
+echo "2. Vérifiez que toutes les variables d'environnement sont configurées"
+echo "3. Vérifiez les logs de build pour des erreurs"
+echo "4. Contactez-moi avec les logs d'erreur"
