@@ -1,30 +1,32 @@
 // Vercel API handler for NestJS
+const express = require('express');
 const { NestFactory } = require('@nestjs/core');
 const { AppModule } = require('../dist/app.module');
 
-let app;
+const app = express();
+let nestApp;
 
-async function createApp() {
-  if (!app) {
+async function createNestApp() {
+  if (!nestApp) {
     try {
-      app = await NestFactory.create(AppModule, {
+      nestApp = await NestFactory.create(AppModule, {
         logger: ['error', 'warn', 'log'],
       });
-      app.setGlobalPrefix('api');
-      await app.init();
+      nestApp.setGlobalPrefix('api');
+      await nestApp.init();
     } catch (error) {
       console.error('Error creating NestJS app:', error);
       throw error;
     }
   }
-  return app;
+  return nestApp;
 }
 
-module.exports = async (req, res) => {
+app.use(async (req, res, next) => {
   try {
-    const nestApp = await createApp();
+    const nestApp = await createNestApp();
     const expressApp = nestApp.getHttpAdapter().getInstance();
-    expressApp(req, res);
+    expressApp(req, res, next);
   } catch (error) {
     console.error('Error in Vercel handler:', error);
     res.status(500).json({ 
@@ -33,4 +35,6 @@ module.exports = async (req, res) => {
       timestamp: new Date().toISOString()
     });
   }
-};
+});
+
+module.exports = app;
