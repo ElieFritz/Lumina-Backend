@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Script de déploiement direct Vercel
+echo "🚀 Déploiement Direct Vercel"
+echo "============================"
+
+echo "📋 Problème identifié :"
+echo "Vercel détecte automatiquement l'équipe 'enollafritzs-projects'"
+echo "mais le compte Git n'a pas les permissions nécessaires."
+echo ""
+
+echo "🔧 Solution : Déploiement via Dashboard Vercel"
+echo ""
+
+echo "📊 Étapes à suivre :"
+echo ""
+echo "1. **Allez sur le Dashboard Vercel :**"
+echo "   https://vercel.com/dashboard"
+echo ""
+echo "2. **Cliquez sur 'New Project'**"
+echo ""
+echo "3. **Importez le repository GitHub :**"
+echo "   https://github.com/ElieFritz/Lumina"
+echo ""
+echo "4. **Configuration du projet :**"
+echo "   - Project Name: lumina-backend"
+echo "   - Framework Preset: Other"
+echo "   - Root Directory: backend"
+echo "   - Build Command: npm run vercel-build"
+echo "   - Output Directory: dist"
+echo "   - Install Command: npm install"
+echo ""
+echo "5. **Variables d'environnement :**"
+echo "   NODE_ENV=production"
+echo "   DATABASE_URL=postgresql://postgres.baoywgzpmndrbiagiczs:Eliefritz97@aws-1-ca-central-1.pooler.supabase.com:6543/postgres"
+echo "   NEXT_PUBLIC_SUPABASE_URL=https://baoywgzpmndrbiagiczs.supabase.co"
+echo "   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhb3l3Z3pwbW5kcmJpYWdpY3pzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTA2NjUsImV4cCI6MjA3MzUyNjY2NX0.KP9VMywToT5YvHikWqmTi5pO6HEWitL14-cnJ9jETYs"
+echo "   FRONTEND_URL=https://lumina-africa-frontend.vercel.app"
+echo ""
+echo "6. **Déployez !**"
+echo ""
+
+echo "🌐 URLs utiles :"
+echo "- Dashboard: https://vercel.com/dashboard"
+echo "- Repository: https://github.com/ElieFritz/Lumina"
+echo ""
+
+echo "✅ Une fois déployé, votre API sera accessible à :"
+echo "   https://lumina-backend-[hash].vercel.app"
+echo ""
+
+echo "🧪 Test de l'API :"
+echo "curl https://lumina-backend-[hash].vercel.app/api/health"
+echo ""
+
+echo "📋 Configuration complète dans vercel-guide.md"
